@@ -1,4 +1,4 @@
-import type { scalewayVaultConfigSchema } from "@dokploy/server/db/schema";
+import type { scalewayVaultConfigSchema } from "@vieploy/server/db/schema";
 import type { z } from "zod";
 import { type VaultClient, vaultFetch } from "./types";
 

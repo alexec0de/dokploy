@@ -1,26 +1,26 @@
 {
-	"name": "dokploy",
+	"name": "vieploy",
 	"private": true,
 	"workspaces": [
 		"apps/*",
 		"packages/*"
 	],
 	"scripts": {
-		"dokploy:setup": "pnpm --filter=dokploy run setup",
-		"dokploy:dev": "pnpm --filter=dokploy run dev",
-		"dokploy:build": "pnpm --filter=dokploy run build",
-		"dokploy:start": "pnpm --filter=dokploy run start",
-		"test": "pnpm --filter=dokploy run test",
+		"vieploy:setup": "pnpm --filter=vieploy run setup",
+		"vieploy:dev": "pnpm --filter=vieploy run dev",
+		"vieploy:build": "pnpm --filter=vieploy run build",
+		"vieploy:start": "pnpm --filter=vieploy run start",
+		"test": "pnpm --filter=vieploy run test",
 		"server:script": "pnpm --filter=server run switch:dev",
 		"server:dev": "pnpm --filter=server run dev",
 		"server:build": "pnpm --filter=server run build",
-		"docker:build:canary": "./apps/dokploy/docker/build.sh canary",
+		"docker:build:canary": "./apps/vieploy/docker/build.sh canary",
 		"typecheck": "pnpm -r run typecheck",
 		"build": "pnpm -r run build",
 		"format-and-lint": "biome check .",
 		"check": "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true",
 		"format-and-lint:fix": "biome check . --write",
-		"generate:openapi": "pnpm --filter=dokploy run generate:openapi"
+		"generate:openapi": "pnpm --filter=vieploy run generate:openapi"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.7",

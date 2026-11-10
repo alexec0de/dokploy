@@ -1,6 +1,6 @@
-import { db } from "@dokploy/server/db";
-import { notifications } from "@dokploy/server/db/schema";
-import DockerCleanupEmail from "@dokploy/server/emails/emails/docker-cleanup";
+import { db } from "@vieploy/server/db";
+import { notifications } from "@vieploy/server/db/schema";
+import DockerCleanupEmail from "@vieploy/server/emails/emails/docker-cleanup";
 import { render } from "@react-email/components";
 import { format } from "date-fns";
 import { and, eq } from "drizzle-orm";
@@ -115,7 +115,7 @@ export const sendDockerCleanupNotifications = async (
 					],
 					timestamp: date.toISOString(),
 					footer: {
-						text: "Dokploy Docker Cleanup Notification",
+						text: "Vieploy Docker Cleanup Notification",
 					},
 				});
 			}
@@ -176,7 +176,7 @@ export const sendDockerCleanupNotifications = async (
 				await sendMattermostNotification(mattermost, {
 					text: `**✅ Docker Cleanup**\n\n**Message:** ${message}\n**Date:** ${format(date, "PP")}\n**Time:** ${format(date, "pp")}`,
 					channel: mattermost.channel,
-					username: mattermost.username || "Dokploy",
+					username: mattermost.username || "Vieploy",
 				});
 			}
 

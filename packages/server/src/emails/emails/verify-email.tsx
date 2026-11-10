@@ -5,7 +5,6 @@ import {
 	Head,
 	Heading,
 	Html,
-	Img,
 	Link,
 	Preview,
 	Section,
@@ -23,7 +22,7 @@ export const VerifyEmailTemplate = ({
 	userName = "User",
 	verificationUrl = "https://app.dokploy.com/verify",
 }: TemplateProps) => {
-	const previewText = "Verify your email address to get started with Dokploy";
+	const previewText = "Verify your email address to get started with Vieploy";
 	return (
 		<Html>
 			<Head />
@@ -33,13 +32,9 @@ export const VerifyEmailTemplate = ({
 					<Container className="my-[40px] mx-auto max-w-[520px]">
 						{/* Header */}
 						<Section className="bg-[#09090b] rounded-t-xl px-[40px] py-[32px] text-center">
-							<Img
-								src="https://raw.githubusercontent.com/Dokploy/website/refs/heads/main/apps/docs/public/logo-dokploy-blackpng.png"
-								width="190"
-								height="120"
-								alt="Dokploy"
-								className="my-0 mx-auto"
-							/>
+							<Text className="text-white text-[26px] font-bold text-center my-0">
+								Vieploy
+							</Text>
 						</Section>
 
 						{/* Body */}
@@ -48,7 +43,7 @@ export const VerifyEmailTemplate = ({
 								Verify Your Email
 							</Heading>
 							<Text className="text-[#71717a] text-[14px] leading-[22px] m-0 mb-[24px]">
-								Hello {userName}, thank you for signing up for Dokploy. Please
+								Hello {userName}, thank you for signing up for Vieploy. Please
 								verify your email address to activate your account.
 							</Text>
 
@@ -79,7 +74,7 @@ export const VerifyEmailTemplate = ({
 									href="https://dokploy.com"
 									className="text-[#71717a] underline"
 								>
-									Dokploy Cloud
+									Vieploy Cloud
 								</Link>
 								. If you didn't create an account, you can safely ignore this
 								email.

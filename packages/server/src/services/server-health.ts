@@ -1,14 +1,14 @@
-import { db } from "@dokploy/server/db";
+import { db } from "@vieploy/server/db";
 import {
 	applications,
 	compose,
 	environments,
 	projects,
-} from "@dokploy/server/db/schema";
+} from "@vieploy/server/db/schema";
 import {
 	execAsync,
 	execAsyncRemote,
-} from "@dokploy/server/utils/process/execAsync";
+} from "@vieploy/server/utils/process/execAsync";
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
 import { IS_CLOUD } from "../constants";

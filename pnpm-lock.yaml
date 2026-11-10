@@ -70,7 +70,7 @@ importers:
 
   apps/api:
     dependencies:
-      '@dokploy/server':
+      '@vieploy/server':
         specifier: workspace:*
         version: link:../../packages/server
       '@hono/node-server':
@@ -126,7 +126,7 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2
 
-  apps/dokploy:
+  apps/vieploy:
     dependencies:
       '@ai-sdk/anthropic':
         specifier: ^3.0.44
@@ -200,7 +200,7 @@ importers:
       '@codemirror/view':
         specifier: ^6.39.15
         version: 6.43.6
-      '@dokploy/server':
+      '@vieploy/server':
         specifier: workspace:*
         version: link:../../packages/server
       '@dokploy/trpc-openapi':
@@ -549,7 +549,7 @@ importers:
 
   apps/schedules:
     dependencies:
-      '@dokploy/server':
+      '@vieploy/server':
         specifier: workspace:*
         version: link:../../packages/server
       '@hono/node-server':

@@ -1,15 +1,15 @@
-import { IS_CLOUD } from "@dokploy/server/constants";
-import { db } from "@dokploy/server/db";
-import { organization } from "@dokploy/server/db/schema";
-import { findServersByOrganizationForVectorAgent } from "@dokploy/server/services/server";
+import { IS_CLOUD } from "@vieploy/server/constants";
+import { db } from "@vieploy/server/db";
+import { organization } from "@vieploy/server/db/schema";
+import { findServersByOrganizationForVectorAgent } from "@vieploy/server/services/server";
 import {
 	getWebServerSettings,
 	releaseWebServerAgent,
-} from "@dokploy/server/services/web-server-settings";
+} from "@vieploy/server/services/web-server-settings";
 import {
 	removeVectorAgent,
 	withVectorTargetLock,
-} from "@dokploy/server/setup/vector-setup";
+} from "@vieploy/server/setup/vector-setup";
 import { eq } from "drizzle-orm";
 
 export const removeVectorAgents = async (organizationId: string) => {

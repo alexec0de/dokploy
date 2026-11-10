@@ -1,10 +1,10 @@
-import { db } from "@dokploy/server/db";
-import { type apiCreateRegistry, registry } from "@dokploy/server/db/schema";
+import { db } from "@vieploy/server/db";
+import { type apiCreateRegistry, registry } from "@vieploy/server/db/schema";
 import {
 	execAsync,
 	execAsyncRemote,
 	execFileAsync,
-} from "@dokploy/server/utils/process/execAsync";
+} from "@vieploy/server/utils/process/execAsync";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import type { z } from "zod";

@@ -3,7 +3,7 @@ import { join } from "node:path";
 import {
 	execAsync,
 	execAsyncRemote,
-} from "@dokploy/server/utils/process/execAsync";
+} from "@vieploy/server/utils/process/execAsync";
 import { and, eq } from "drizzle-orm";
 
 import semver from "semver";
@@ -22,17 +22,27 @@ export interface IUpdateData {
 	updateAvailable: boolean;
 }
 
+const configuredImage = process.env.VIEPLOY_IMAGE;
+export const VIEPLOY_IMAGE =
+	configuredImage &&
+	/^[a-z0-9]+(?:[._-][a-z0-9]+)*\/[a-z0-9]+(?:[._-][a-z0-9]+)*$/.test(
+		configuredImage,
+	) &&
+	configuredImage !== "dokploy/dokploy"
+		? configuredImage
+		: undefined;
+
 export const DEFAULT_UPDATE_DATA: IUpdateData = {
 	latestVersion: null,
 	updateAvailable: false,
 };
 
-/** Returns current Dokploy docker image tag or `latest` by default. */
+/** Returns current Vieploy docker image tag or `latest` by default. */
 export const getDokployImageTag = () => {
 	return process.env.RELEASE_TAG || "latest";
 };
 
-/** Returns Dokploy docker service image digest */
+/** Returns Vieploy docker service image digest */
 export const getServiceImageDigest = async () => {
 	const { stdout } = await execAsync(
 		"docker service inspect dokploy --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}'",
@@ -51,9 +61,9 @@ export const getServiceImageDigest = async () => {
 export const getUpdateData = async (
 	currentVersion: string,
 ): Promise<IUpdateData> => {
+	if (!VIEPLOY_IMAGE) return DEFAULT_UPDATE_DATA;
 	try {
-		const baseUrl =
-			"https://hub.docker.com/v2/repositories/dokploy/dokploy/tags";
+		const baseUrl = `https://hub.docker.com/v2/repositories/${VIEPLOY_IMAGE}/tags`;
 		let url: string | null = `${baseUrl}?page_size=100`;
 		let allResults: { digest: string; name: string }[] = [];
 
@@ -286,22 +296,11 @@ fi`;
 export const reloadDockerResource = async (
 	resourceName: string,
 	serverId?: string,
-	version?: string,
 ) => {
 	const resourceType = await getDockerResourceType(resourceName, serverId);
 	let command = "";
 	if (resourceType === "service") {
-		if (resourceName === "dokploy") {
-			const currentImageTag = getDokployImageTag();
-			let imageTag = version;
-			if (currentImageTag === "canary" || currentImageTag === "feature") {
-				imageTag = currentImageTag;
-			}
-
-			command = `docker service update --force --image dokploy/dokploy:${imageTag} ${resourceName}`;
-		} else {
-			command = `docker service update --force ${resourceName}`;
-		}
+		command = `docker service update --force ${resourceName}`;
 	} else if (resourceType === "standalone") {
 		command = `docker restart ${resourceName}`;
 	} else {
@@ -443,7 +442,7 @@ export const togglePanelPort = async (enable: boolean) => {
 	const resourceType = await getDockerResourceType("dokploy");
 	if (resourceType !== "service") {
 		throw new Error(
-			"The Dokploy panel is not running as a Docker Swarm service, the port can't be managed from the UI",
+			"The Vieploy panel is not running as a Docker Swarm service, the port can't be managed from the UI",
 		);
 	}
 	const publishFlag = enable
@@ -473,7 +472,7 @@ export const checkPortInUse = async (
 		}
 
 		// Check if port is in use by a host-level service (non-Docker)
-		// Dokploy runs inside a container, so we spawn an ephemeral container
+		// Vieploy runs inside a container, so we spawn an ephemeral container
 		// with --net=host to share the host's network stack and use nc -z to
 		// check if something is listening on the port
 		const hostCommand = `docker run --rm --net=host busybox sh -c 'nc -z 0.0.0.0 ${port} 2>/dev/null && echo in_use || echo free'`;

@@ -7,7 +7,6 @@ import {
 	Heading,
 	Hr,
 	Html,
-	Img,
 	Link,
 	Preview,
 	Row,
@@ -35,8 +34,8 @@ export const TrialExpiringEmail = ({
 	const dayLabel = daysRemaining === 1 ? "day" : "days";
 	const previewText =
 		daysRemaining === 1
-			? "Your Dokploy trial ends tomorrow"
-			: `Your Dokploy trial ends in ${daysRemaining} ${dayLabel}`;
+			? "Your Vieploy trial ends tomorrow"
+			: `Your Vieploy trial ends in ${daysRemaining} ${dayLabel}`;
 
 	return (
 		<Html>
@@ -46,13 +45,9 @@ export const TrialExpiringEmail = ({
 				<Body className="bg-[#f4f4f5] my-auto mx-auto font-sans">
 					<Container className="my-[40px] mx-auto max-w-[520px]">
 						<Section className="bg-[#09090b] rounded-t-xl px-[40px] py-[32px] text-center">
-							<Img
-								src="https://raw.githubusercontent.com/Dokploy/website/refs/heads/main/apps/docs/public/logo-dokploy-blackpng.png"
-								width="190"
-								height="120"
-								alt="Dokploy"
-								className="my-0 mx-auto"
-							/>
+							<Text className="text-white text-[26px] font-bold text-center my-0">
+								Vieploy
+							</Text>
 						</Section>
 
 						<Section className="bg-white px-[40px] py-[32px]">
@@ -118,7 +113,7 @@ export const TrialExpiringEmail = ({
 									href="https://dokploy.com"
 									className="text-[#71717a] underline"
 								>
-									Dokploy Cloud
+									Vieploy Cloud
 								</Link>
 								. If you have any questions about your billing, please contact
 								our{" "}

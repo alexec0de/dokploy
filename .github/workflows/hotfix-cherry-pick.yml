@@ -26,7 +26,7 @@ jobs:
         env:
           MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
         run: |
-          git config user.name "Dokploy Bot"
+          git config user.name "Vieploy Bot"
           git config user.email "bot@dokploy.com"
           SHA="$MERGE_SHA"
           if [ "$(git rev-list --parents -n1 "$SHA" | wc -w)" -gt 2 ]; then
@@ -39,7 +39,7 @@ jobs:
 
       - name: Sync cherry-pick back into canary
         run: |
-          git config user.name "Dokploy Bot"
+          git config user.name "Vieploy Bot"
           git config user.email "bot@dokploy.com"
           git fetch origin canary main
           git checkout -B canary origin/canary

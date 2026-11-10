@@ -1,9 +1,9 @@
-import { CLEANUP_CRON_JOB } from "@dokploy/server/constants";
-import { member } from "@dokploy/server/db/schema";
-import type { BackupSchedule } from "@dokploy/server/services/backup";
-import { findDestinationById } from "@dokploy/server/services/destination";
-import { getAllServers } from "@dokploy/server/services/server";
-import { getWebServerSettings } from "@dokploy/server/services/web-server-settings";
+import { CLEANUP_CRON_JOB } from "@vieploy/server/constants";
+import { member } from "@vieploy/server/db/schema";
+import type { BackupSchedule } from "@vieploy/server/services/backup";
+import { findDestinationById } from "@vieploy/server/services/destination";
+import { getAllServers } from "@vieploy/server/services/server";
+import { getWebServerSettings } from "@vieploy/server/services/web-server-settings";
 import { eq } from "drizzle-orm";
 import { scheduleJob } from "node-schedule";
 import { db } from "../../db/index";

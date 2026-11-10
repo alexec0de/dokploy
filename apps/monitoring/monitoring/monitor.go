@@ -18,8 +18,8 @@ import (
 	"github.com/shirou/gopsutil/v3/mem"
 	"github.com/shirou/gopsutil/v3/net"
 
-	"github.com/mauriciogm/dokploy/apps/monitoring/config"
-	"github.com/mauriciogm/dokploy/apps/monitoring/database"
+	"vieploy.local/monitoring/config"
+	"vieploy.local/monitoring/database"
 )
 
 type SystemMetrics struct {

@@ -1,5 +1,5 @@
-import { db } from "@dokploy/server/db";
-import { webServerSettings } from "@dokploy/server/db/schema";
+import { db } from "@vieploy/server/db";
+import { webServerSettings } from "@vieploy/server/db/schema";
 import { and, eq, isNull, or } from "drizzle-orm";
 
 /**

@@ -47,6 +47,7 @@ export const session = pgTable(
 		userId: text("user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
+		twoFactorVerified: boolean("two_factor_verified").default(false).notNull(),
 		activeOrganizationId: text("active_organization_id"),
 		impersonatedBy: text("impersonated_by"),
 	},

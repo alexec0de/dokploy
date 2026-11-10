@@ -12,17 +12,22 @@ function resolveBetterAuthSecret(): string {
 		return readSecret(BETTER_AUTH_SECRET_FILE);
 	}
 	if (process.env.NODE_ENV !== "test") {
-		console.warn(`
-⚠️  [DEPRECATED AUTH CONFIG]
-BETTER_AUTH_SECRET is not set via environment variable or Docker secret.
-Falling back to the insecure hardcoded default — this is a CRITICAL SECURITY RISK.
-This mode WILL BE REMOVED in a future release.
-
-Please migrate to Docker Secrets:
-  curl -sSL https://dokploy.com/security/0.29.3.sh | bash
-`);
+		console.warn(
+			"Using the legacy development authentication secret. Configure BETTER_AUTH_SECRET or BETTER_AUTH_SECRET_FILE for production.",
+		);
 	}
 	return HARDCODED_LEGACY_SECRET;
 }
 
 export const betterAuthSecret = resolveBetterAuthSecret();
+
+export function assertProductionAuthSecret() {
+	if (
+		betterAuthSecret === HARDCODED_LEGACY_SECRET ||
+		betterAuthSecret.length < 32
+	) {
+		throw new Error(
+			"Configure a unique BETTER_AUTH_SECRET or BETTER_AUTH_SECRET_FILE with at least 32 characters before starting Vieploy.",
+		);
+	}
+}

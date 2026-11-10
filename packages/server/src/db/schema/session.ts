@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./user";
 
 // OLD TABLE
@@ -14,5 +14,6 @@ export const session = pgTable("session", {
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
 	impersonatedBy: text("impersonated_by"),
+	twoFactorVerified: boolean("two_factor_verified").notNull().default(false),
 	activeOrganizationId: text("active_organization_id"),
 });

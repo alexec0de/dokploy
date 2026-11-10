@@ -1,5 +1,5 @@
-import { docker } from "@dokploy/server/constants";
-import { findServerById } from "@dokploy/server/services/server";
+import { docker } from "@vieploy/server/constants";
+import { findServerById } from "@vieploy/server/services/server";
 import Dockerode from "dockerode";
 import { sshKeepalive } from "../process/execAsync";
 

@@ -16,6 +16,8 @@ export function readSecret(path: string): string {
 		throw new Error(`Cannot read secret at ${path}`);
 	}
 }
+const LEGACY_POSTGRES_PASSWORD = "amukds4wi9001583845717ad2";
+
 export let dbUrl: string;
 if (DATABASE_URL) {
 	// Compatibilidad legacy / overrides
@@ -27,21 +29,23 @@ if (DATABASE_URL) {
 	)}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}`;
 } else {
 	if (process.env.NODE_ENV !== "test") {
-		console.warn(`
-		⚠️  [DEPRECATED DATABASE CONFIG]
-		You are using the legacy hardcoded database credentials.
-		This mode WILL BE REMOVED in a future release.
-		
-		Please migrate to Docker Secrets using POSTGRES_PASSWORD_FILE.
-		Please execute this command in your server: curl -sSL https://dokploy.com/security/0.26.6.sh | bash
-		`);
+		console.warn(
+			"Using legacy development database credentials. Configure DATABASE_URL or POSTGRES_PASSWORD_FILE for production.",
+		);
 	}
 
 	if (process.env.NODE_ENV === "production") {
-		dbUrl =
-			"postgres://dokploy:amukds4wi9001583845717ad2@dokploy-postgres:5432/dokploy";
+		dbUrl = `postgres://dokploy:${LEGACY_POSTGRES_PASSWORD}@dokploy-postgres:5432/dokploy`;
 	} else {
-		dbUrl =
-			"postgres://dokploy:amukds4wi9001583845717ad2@localhost:5432/dokploy";
+		dbUrl = `postgres://dokploy:${LEGACY_POSTGRES_PASSWORD}@localhost:5432/dokploy`;
+	}
+}
+
+export function assertProductionDatabaseCredentials() {
+	const password = decodeURIComponent(new URL(dbUrl).password);
+	if (password === LEGACY_POSTGRES_PASSWORD) {
+		throw new Error(
+			"Configure private PostgreSQL credentials with DATABASE_URL or POSTGRES_PASSWORD_FILE before starting Vieploy.",
+		);
 	}
 }

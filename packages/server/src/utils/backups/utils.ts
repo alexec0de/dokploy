@@ -1,6 +1,6 @@
-import { logger } from "@dokploy/server/lib/logger";
-import type { BackupSchedule } from "@dokploy/server/services/backup";
-import type { Destination } from "@dokploy/server/services/destination";
+import { logger } from "@vieploy/server/lib/logger";
+import type { BackupSchedule } from "@vieploy/server/services/backup";
+import type { Destination } from "@vieploy/server/services/destination";
 import { scheduledJobs, scheduleJob } from "node-schedule";
 import { quote } from "shell-quote";
 import { keepLatestNBackups } from ".";

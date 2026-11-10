@@ -1,6 +1,6 @@
 import { type LookupAddress, lookup } from "node:dns";
 import { BlockList, isIP, type LookupFunction } from "node:net";
-import { IS_CLOUD } from "@dokploy/server/constants";
+import { IS_CLOUD } from "@vieploy/server/constants";
 import { Agent } from "undici";
 
 export const PROVIDER_REQUEST_TIMEOUT_MS = 15_000;

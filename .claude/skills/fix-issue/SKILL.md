@@ -10,8 +10,8 @@ The issue number is passed as $1.
 
 No instance is running yet — start your own, isolated to this worktree:
 
-1. Check `apps/dokploy/.env` for `PORT` (assigned per-worktree already).
-2. If nothing is listening on that port, start it: `pnpm dokploy:dev` in the
+1. Check `apps/vieploy/.env` for `PORT` (assigned per-worktree already).
+2. If nothing is listening on that port, start it: `pnpm vieploy:dev` in the
    background, then poll `curl -s -o /dev/null -w '%{http_code}' http://localhost:$PORT`
    until it answers (usually ~10-15s).
 3. Use `http://localhost:$PORT` as the base URL for Playwright navigation.
@@ -24,7 +24,7 @@ to relaunch with `DOKPLOY_BASE_URL` exported first.
 
 ## Tools
 
-- `mcp__dokploy__*` — the Dokploy API of the running instance. Use it to set up
+- `mcp__dokploy__*` — the Vieploy API of the running instance. Use it to set up
   state (create a project, an app, an env var) and to verify backend behavior.
   Search for the tool you need; they are not all loaded upfront.
 - `mcp__playwright__*` — the browser at $DOKPLOY_BASE_URL. Use it for anything
@@ -34,7 +34,7 @@ Pick by where the bug lives, not by convenience:
 
 - Bug in the UI (rendering, forms, navigation, state) → reproduce in Playwright.
   The API returning correct data proves nothing here.
-- Bug in the API, deploy logic, or data → reproduce with the Dokploy MCP.
+- Bug in the API, deploy logic, or data → reproduce with the Vieploy MCP.
   A green screenshot proves nothing here.
 - Unclear → do both.
 

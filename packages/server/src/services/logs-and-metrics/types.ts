@@ -1,4 +1,4 @@
-import type { telemetryProviderType } from "@dokploy/server/db/schema/telemetry-provider";
+import type { telemetryProviderType } from "@vieploy/server/db/schema/telemetry-provider";
 
 export type TelemetrySignal = "logs" | "metrics";
 

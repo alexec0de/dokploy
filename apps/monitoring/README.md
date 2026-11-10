@@ -1,6 +1,6 @@
-# Dokploy Monitoring (Go Version)
+# Vieploy Monitoring (Go Version)
 
-Application that powers Dokploy's monitoring service.
+Application that powers Vieploy's monitoring service.
 
 You can use it for monitoring any external service.
 
@@ -138,7 +138,7 @@ Metrics JSON:
 
 ## Notifications
 
-Dokploy uses a callback URL to send notifications when metrics exceed configured thresholds. Notifications are sent via POST request in the following format:
+Vieploy uses a callback URL to send notifications when metrics exceed configured thresholds. Notifications are sent via POST request in the following format:
 
 Note: Setting a threshold to 0 disables notifications for that metric.
 

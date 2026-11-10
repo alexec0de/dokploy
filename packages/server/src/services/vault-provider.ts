@@ -1,12 +1,12 @@
-import { db } from "@dokploy/server/db";
+import { db } from "@vieploy/server/db";
 import {
 	type apiCreateVaultProvider,
 	projects,
 	type VaultProviderAssignment,
 	type VaultProviderConfig,
 	vaultProvider,
-} from "@dokploy/server/db/schema";
-import { getVaultClient } from "@dokploy/server/utils/vault";
+} from "@vieploy/server/db/schema";
+import { getVaultClient } from "@vieploy/server/utils/vault";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import type { z } from "zod";

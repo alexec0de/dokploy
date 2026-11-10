@@ -1,7 +1,7 @@
 import { existsSync, promises as fsPromises } from "node:fs";
 import path from "node:path";
-import { paths } from "@dokploy/server/constants";
-import { db } from "@dokploy/server/db";
+import { paths } from "@vieploy/server/constants";
+import { db } from "@vieploy/server/db";
 import {
 	type apiCreateDeployment,
 	type apiCreateDeploymentBackup,
@@ -15,15 +15,15 @@ import {
 	deployments,
 	environments,
 	projects,
-} from "@dokploy/server/db/schema";
-import { encodeBase64 } from "@dokploy/server/utils/docker/utils";
-import { removeDirectoryIfExistsContent } from "@dokploy/server/utils/filesystem/directory";
+} from "@vieploy/server/db/schema";
+import { encodeBase64 } from "@vieploy/server/utils/docker/utils";
+import { removeDirectoryIfExistsContent } from "@vieploy/server/utils/filesystem/directory";
 import {
 	ExecError,
 	execAsync,
 	execAsyncRemote,
-} from "@dokploy/server/utils/process/execAsync";
-import { trackDeploymentResult } from "@dokploy/server/utils/tracking/posthog";
+} from "@vieploy/server/utils/process/execAsync";
+import { trackDeploymentResult } from "@vieploy/server/utils/tracking/posthog";
 import { TRPCError } from "@trpc/server";
 import { format } from "date-fns";
 import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
@@ -149,7 +149,7 @@ export const createDeployment = async (
 			const command = `
 				mkdir -p ${LOGS_PATH}/${application.appName};
             	echo "Initializing deployment" >> ${logFilePath};
-			    echo "Building on ${serverId ? "Build Server" : "Dokploy Server"}" >> ${logFilePath};
+			    echo "Building on ${serverId ? "Build Server" : "Vieploy Server"}" >> ${logFilePath};
 			`;
 
 			await execAsyncRemote(server.serverId, command);

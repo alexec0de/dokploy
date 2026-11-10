@@ -1,7 +1,7 @@
-import { db } from "@dokploy/server/db";
-import type { AuditAction, AuditResourceType } from "@dokploy/server/db/schema";
-import { auditLog } from "@dokploy/server/db/schema";
-import { hasValidLicense } from "@dokploy/server/services/proprietary/license-key";
+import { db } from "@vieploy/server/db";
+import type { AuditAction, AuditResourceType } from "@vieploy/server/db/schema";
+import { auditLog } from "@vieploy/server/db/schema";
+import { hasValidLicense } from "@vieploy/server/services/proprietary/license-key";
 import { and, desc, eq, gte, ilike, lte } from "drizzle-orm";
 
 export type { AuditAction, AuditResourceType };

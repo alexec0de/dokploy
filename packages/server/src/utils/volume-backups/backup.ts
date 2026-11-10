@@ -1,8 +1,8 @@
 import path from "node:path";
-import { paths } from "@dokploy/server/constants";
-import { findComposeById } from "@dokploy/server/services/compose";
-import { findDestinationById } from "@dokploy/server/services/destination";
-import type { findVolumeBackupById } from "@dokploy/server/services/volume-backups";
+import { paths } from "@vieploy/server/constants";
+import { findComposeById } from "@vieploy/server/services/compose";
+import { findDestinationById } from "@vieploy/server/services/destination";
+import type { findVolumeBackupById } from "@vieploy/server/services/volume-backups";
 import {
 	getBackupTimestamp,
 	getS3Credentials,

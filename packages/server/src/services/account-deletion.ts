@@ -1,5 +1,5 @@
 import { createHash, randomInt, timingSafeEqual } from "node:crypto";
-import { db } from "@dokploy/server/db";
+import { db } from "@vieploy/server/db";
 import {
 	auditLog,
 	backups,
@@ -7,8 +7,8 @@ import {
 	organization,
 	user,
 	verification,
-} from "@dokploy/server/db/schema";
-import { removeVectorAgents } from "@dokploy/server/services/organization";
+} from "@vieploy/server/db/schema";
+import { removeVectorAgents } from "@vieploy/server/services/organization";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray } from "drizzle-orm";
 import { nanoid } from "nanoid";

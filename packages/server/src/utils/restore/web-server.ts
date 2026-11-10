@@ -1,8 +1,8 @@
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { IS_CLOUD, paths } from "@dokploy/server/constants";
-import type { Destination } from "@dokploy/server/services/destination";
+import { IS_CLOUD, paths } from "@vieploy/server/constants";
+import type { Destination } from "@vieploy/server/services/destination";
 import { quote } from "shell-quote";
 import { getS3Credentials } from "../backups/utils";
 import { execAsync } from "../process/execAsync";
@@ -91,7 +91,7 @@ export const restoreWebServerBackup = async (
 			);
 
 			if (!postgresContainer) {
-				throw new Error("Dokploy Postgres container not found");
+				throw new Error("Vieploy Postgres container not found");
 			}
 
 			const postgresContainerId = postgresContainer.trim();

@@ -17,7 +17,7 @@ build({
 	format: "esm",
 	plugins: [
 		alias({
-			"@dokploy/server": path.resolve(__dirname, "src"),
+			"@vieploy/server": path.resolve(__dirname, "src"),
 		}),
 	],
 	packages: "external",

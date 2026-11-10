@@ -1,9 +1,9 @@
-import { db } from "@dokploy/server/db";
+import { db } from "@vieploy/server/db";
 import {
 	type apiCreateGitea,
 	gitea,
 	gitProvider,
-} from "@dokploy/server/db/schema";
+} from "@vieploy/server/db/schema";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import type { z } from "zod";

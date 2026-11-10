@@ -197,7 +197,7 @@ const PREVIOUS_TRAEFIK_CONTAINER = "dokploy-traefik-previous";
 export const restoreInterruptedTraefik = (serverId?: string) =>
 	runQueued(serverId, () => restoreBackupTraefik(serverId));
 
-// Undoes an update interrupted by a Dokploy restart.
+// Undoes an update interrupted by a Vieploy restart.
 const restoreBackupTraefik = async (serverId?: string) => {
 	const docker = await getRemoteDocker(serverId);
 	const inspect = (name: string) =>

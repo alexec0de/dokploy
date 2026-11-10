@@ -1,0 +1,75 @@
+import { findGitlabById, updateGitlab, validateRequest } from "@vieploy/server";
+import type { NextApiRequest, NextApiResponse } from "next";
+
+export default async function handler(
+	req: NextApiRequest,
+	res: NextApiResponse,
+) {
+	const { code, gitlabId } = req.query;
+
+	if (!code || Array.isArray(code)) {
+		return res.status(400).json({ error: "Missing or invalid code" });
+	}
+
+	const { user, session } = await validateRequest(req);
+	if (!user || !session?.activeOrganizationId) {
+		return res.status(401).json({ error: "Unauthorized" });
+	}
+
+	const gitlab = await findGitlabById(gitlabId as string);
+
+	if (gitlab.gitProvider.organizationId !== session.activeOrganizationId) {
+		return res.status(404).json({ error: "Gitlab provider not found" });
+	}
+	// Use internal URL for token exchange when GitLab is on same instance as Vieploy
+	const baseUrl = gitlab.gitlabInternalUrl || gitlab.gitlabUrl;
+	const gitlabUrl = new URL(baseUrl);
+
+	const headers: HeadersInit = {
+		"Content-Type": "application/x-www-form-urlencoded",
+	};
+
+	// In case of basic auth being present in the URL, we need to remove it from the URL
+	// and add it to the Authorization header.
+	if (gitlabUrl.username && gitlabUrl.password) {
+		headers.Authorization = `Basic ${Buffer.from(`${gitlabUrl.username}:${gitlabUrl.password}`).toString("base64")}`;
+	}
+
+	const url =
+		gitlabUrl.username && gitlabUrl.password
+			? new URL(gitlabUrl, {
+					...gitlabUrl,
+					username: "",
+					password: "",
+				}).toString()
+			: gitlabUrl.toString();
+
+	const response = await fetch(`${url}/oauth/token`, {
+		method: "POST",
+		headers,
+		body: new URLSearchParams({
+			client_id: gitlab.applicationId as string,
+			client_secret: gitlab.secret as string,
+			code: code as string,
+			grant_type: "authorization_code",
+			redirect_uri: `${gitlab.redirectUri}?gitlabId=${gitlabId}`,
+		}),
+	});
+
+	const result = await response.json();
+
+	if (!result.access_token || !result.refresh_token) {
+		return res.status(400).json({ error: "Missing or invalid code" });
+	}
+
+	const expiresAt = result.expires_in
+		? Math.floor(Date.now() / 1000) + result.expires_in
+		: null;
+	await updateGitlab(gitlab.gitlabId, {
+		accessToken: result.access_token,
+		refreshToken: result.refresh_token,
+		expiresAt,
+	});
+
+	return res.redirect(307, "/dashboard/settings/git-providers");
+}

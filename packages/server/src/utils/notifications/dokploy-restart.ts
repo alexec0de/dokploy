@@ -1,6 +1,6 @@
-import { db } from "@dokploy/server/db";
-import { notifications } from "@dokploy/server/db/schema";
-import DokployRestartEmail from "@dokploy/server/emails/emails/dokploy-restart";
+import { db } from "@vieploy/server/db";
+import { notifications } from "@vieploy/server/db/schema";
+import DokployRestartEmail from "@vieploy/server/emails/emails/dokploy-restart";
 import { render } from "@react-email/components";
 import { format } from "date-fns";
 import { eq } from "drizzle-orm";
@@ -66,7 +66,7 @@ export const sendDokployRestartNotifications = async () => {
 					if (email) {
 						await sendEmailNotification(
 							email,
-							"Dokploy Server Restarted",
+							"Vieploy Server Restarted",
 							template,
 						);
 					}
@@ -74,7 +74,7 @@ export const sendDokployRestartNotifications = async () => {
 					if (resend) {
 						await sendResendNotification(
 							resend,
-							"Dokploy Server Restarted",
+							"Vieploy Server Restarted",
 							template,
 						);
 					}
@@ -85,7 +85,7 @@ export const sendDokployRestartNotifications = async () => {
 						`${discord.decoration ? decoration : ""} ${text}`.trim();
 
 					await sendDiscordNotification(discord, {
-						title: decorate(">", "`✅` Dokploy Server Restarted"),
+						title: decorate(">", "`✅` Vieploy Server Restarted"),
 						color: 0x57f287,
 						fields: [
 							{
@@ -106,7 +106,7 @@ export const sendDokployRestartNotifications = async () => {
 						],
 						timestamp: date.toISOString(),
 						footer: {
-							text: "Dokploy Restart Notification",
+							text: "Vieploy Restart Notification",
 						},
 					});
 				}
@@ -116,7 +116,7 @@ export const sendDokployRestartNotifications = async () => {
 						`${gotify.decoration ? decoration : ""} ${text}\n`;
 					await sendGotifyNotification(
 						gotify,
-						decorate("✅", "Dokploy Server Restarted"),
+						decorate("✅", "Vieploy Server Restarted"),
 						`${decorate("🕒", `Date: ${date.toLocaleString()}`)}`,
 					);
 				}
@@ -124,7 +124,7 @@ export const sendDokployRestartNotifications = async () => {
 				if (ntfy) {
 					await sendNtfyNotification(
 						ntfy,
-						"Dokploy Server Restarted",
+						"Vieploy Server Restarted",
 						"white_check_mark",
 						"",
 						`🕒Date: ${date.toLocaleString()}`,
@@ -134,7 +134,7 @@ export const sendDokployRestartNotifications = async () => {
 				if (telegram) {
 					await sendTelegramNotification(
 						telegram,
-						`<b>✅ Dokploy Server Restarted</b>\n\n<b>Date:</b> ${format(
+						`<b>✅ Vieploy Server Restarted</b>\n\n<b>Date:</b> ${format(
 							date,
 							"PP",
 						)}\n<b>Time:</b> ${format(date, "pp")}`,
@@ -148,7 +148,7 @@ export const sendDokployRestartNotifications = async () => {
 						attachments: [
 							{
 								color: "#00FF00",
-								pretext: ":white_check_mark: *Dokploy Server Restarted*",
+								pretext: ":white_check_mark: *Vieploy Server Restarted*",
 								fields: [
 									{
 										title: "Time",
@@ -163,17 +163,17 @@ export const sendDokployRestartNotifications = async () => {
 
 				if (mattermost) {
 					await sendMattermostNotification(mattermost, {
-						text: `**✅ Dokploy Server Restarted**\n\n**Date:** ${format(date, "PP")}\n**Time:** ${format(date, "pp")}`,
+						text: `**✅ Vieploy Server Restarted**\n\n**Date:** ${format(date, "PP")}\n**Time:** ${format(date, "pp")}`,
 						channel: mattermost.channel,
-						username: mattermost.username || "Dokploy",
+						username: mattermost.username || "Vieploy",
 					});
 				}
 
 				if (custom) {
 					try {
 						await sendCustomNotification(custom, {
-							title: "Dokploy Server Restarted",
-							message: "Dokploy server has been restarted successfully",
+							title: "Vieploy Server Restarted",
+							message: "Vieploy server has been restarted successfully",
 							timestamp: date.toISOString(),
 							date: date.toLocaleString(),
 							status: "success",
@@ -204,7 +204,7 @@ export const sendDokployRestartNotifications = async () => {
 							header: {
 								title: {
 									tag: "plain_text",
-									content: "✅ Dokploy Server Restarted",
+									content: "✅ Vieploy Server Restarted",
 								},
 								subtitle: {
 									tag: "plain_text",
@@ -262,14 +262,14 @@ export const sendDokployRestartNotifications = async () => {
 				if (pushover) {
 					await sendPushoverNotification(
 						pushover,
-						"Dokploy Server Restarted",
+						"Vieploy Server Restarted",
 						`Date: ${date.toLocaleString()}`,
 					);
 				}
 
 				if (teams) {
 					await sendTeamsNotification(teams, {
-						title: "✅ Dokploy Server Restarted",
+						title: "✅ Vieploy Server Restarted",
 						facts: [
 							{ name: "Status", value: "Successful" },
 							{ name: "Restart Time", value: format(date, "PP pp") },
@@ -281,6 +281,6 @@ export const sendDokployRestartNotifications = async () => {
 			}
 		}
 	} catch (error) {
-		console.error("[Dokploy] Restart notifications failed:", error);
+		console.error("[Vieploy] Restart notifications failed:", error);
 	}
 };

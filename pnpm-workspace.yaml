@@ -1,6 +1,6 @@
 packages:
   - "apps/api"
-  - "apps/dokploy"
+  - "apps/vieploy"
   - "apps/schedules"
   - "packages/server"
 

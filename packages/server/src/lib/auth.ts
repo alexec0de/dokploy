@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import type { IncomingMessage } from "node:http";
 import { apiKey } from "@better-auth/api-key";
 import { passkey } from "@better-auth/passkey";
@@ -6,13 +7,20 @@ import { sso } from "@better-auth/sso";
 import * as bcrypt from "bcrypt";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import {
-	APIError,
-	createAuthMiddleware,
-	getSessionFromCtx,
-} from "better-auth/api";
+import { APIError, createAuthMiddleware } from "better-auth/api";
+import { setSessionCookie } from "better-auth/cookies";
 import { admin, organization, twoFactor } from "better-auth/plugins";
-import { and, desc, eq } from "drizzle-orm";
+import {
+	and,
+	desc,
+	eq,
+	exists,
+	isNotNull,
+	isNull,
+	lte,
+	or,
+	sql,
+} from "drizzle-orm";
 import { IS_CLOUD } from "../constants";
 import { db } from "../db";
 import * as schema from "../db/schema";
@@ -91,6 +99,40 @@ const rewriteToCanonicalOrigin = async (url: string): Promise<string> => {
 	}
 };
 
+const verifyTotpPath = "/two-factor/verify-totp";
+const verifyBackupCodePath = "/two-factor/verify-backup-code";
+const enableTwoFactorPath = "/two-factor/enable";
+
+const hasTwoFactorProof = (session: {
+	session: {
+		id: string;
+		twoFactorVerified?: boolean;
+		impersonatedBy?: string | null;
+	};
+	user: {
+		id: string;
+		twoFactorEnabled?: boolean | null;
+		banned?: boolean | null;
+	};
+}) =>
+	session.user.twoFactorEnabled === true &&
+	!session.user.banned &&
+	session.session.twoFactorVerified === true &&
+	!session.session.impersonatedBy;
+
+const twoFactorIsEnrolled = (userId: string) =>
+	exists(
+		db
+			.select({ id: schema.twoFactor.id })
+			.from(schema.twoFactor)
+			.where(
+				and(
+					eq(schema.twoFactor.userId, userId),
+					eq(schema.twoFactor.verified, true),
+				),
+			),
+	);
+
 const createBetterAuth = () =>
 	betterAuth({
 		database: drizzleAdapter(db, {
@@ -99,6 +141,9 @@ const createBetterAuth = () =>
 		}),
 		disabledPaths: [
 			"/sso/register",
+			"/two-factor/disable",
+			"/two-factor/get-totp-uri",
+			"/admin/impersonate-user",
 			"/organization/create",
 			"/organization/update",
 			"/organization/delete",
@@ -139,7 +184,7 @@ const createBetterAuth = () =>
 				allowDifferentEmails: true,
 			},
 		},
-		appName: "Dokploy",
+		appName: "Vieploy",
 		socialProviders: {
 			github: {
 				clientId: process.env.GITHUB_CLIENT_ID as string,
@@ -167,18 +212,116 @@ const createBetterAuth = () =>
 					});
 				}
 
-				if (ctx.path === "/two-factor/enable") {
-					const session = await getSessionFromCtx(ctx);
-					if (session && !session.user.twoFactorEnabled) {
-						await db
-							.update(schema.twoFactor)
-							.set({ verified: false })
-							.where(
-								and(
-									eq(schema.twoFactor.userId, session.user.id),
-									eq(schema.twoFactor.verified, true),
-								),
-							);
+				if (
+					ctx.path === "/two-factor/disable" ||
+					ctx.path === "/two-factor/get-totp-uri" ||
+					ctx.path === "/admin/impersonate-user"
+				) {
+					throw new APIError("FORBIDDEN", {
+						message: "Two-factor authentication is required",
+					});
+				}
+
+				const isVerification =
+					ctx.path === verifyTotpPath || ctx.path === verifyBackupCodePath;
+				if (isVerification && ctx.body?.trustDevice) {
+					throw new APIError("BAD_REQUEST", {
+						message: "Two-factor authentication is required for every session",
+					});
+				}
+
+				if (ctx.path !== "/get-session") {
+					const token = await ctx.getSignedCookie(
+						ctx.context.authCookies.sessionToken.name,
+						ctx.context.secret,
+					);
+					const stored = token
+						? await ctx.context.internalAdapter.findSession(token)
+						: null;
+					const session =
+						stored && stored.session.expiresAt > new Date() ? stored : null;
+
+					if (
+						session &&
+						ctx.path === enableTwoFactorPath &&
+						session.user.twoFactorEnabled
+					) {
+						throw new APIError("FORBIDDEN", {
+							message: "Two-factor authentication is already enabled",
+						});
+					}
+					if (session && !hasTwoFactorProof(session)) {
+						const mayVerify =
+							!session.session.impersonatedBy &&
+							(ctx.path === verifyTotpPath ||
+								(ctx.path === verifyBackupCodePath &&
+									session.user.twoFactorEnabled));
+						const mayEnroll =
+							!session.session.impersonatedBy &&
+							ctx.path === enableTwoFactorPath &&
+							!session.user.twoFactorEnabled;
+						if (
+							!mayVerify &&
+							!mayEnroll &&
+							ctx.path !== "/sign-out" &&
+							ctx.path !== "/admin/stop-impersonating"
+						) {
+							throw new APIError("FORBIDDEN", {
+								message: "Complete two-factor authentication first",
+							});
+						}
+						if (mayEnroll) {
+							// Older resets cleared the user flag but could leave a verified authenticator.
+							await db
+								.update(schema.twoFactor)
+								.set({ verified: false })
+								.where(
+									and(
+										eq(schema.twoFactor.userId, session.user.id),
+										eq(schema.twoFactor.verified, true),
+										exists(
+											db
+												.select({ id: schema.user.id })
+												.from(schema.user)
+												.where(
+													and(
+														eq(schema.user.id, session.user.id),
+														or(
+															eq(schema.user.twoFactorEnabled, false),
+															isNull(schema.user.twoFactorEnabled),
+														),
+													),
+												),
+										),
+									),
+								);
+						}
+						if (mayVerify) {
+							// Better Auth applies its account lockout only to its sign-in challenge.
+							// Existing OAuth, SSO, and passkey sessions need the same attempt budget.
+							const [attempt] = await db
+								.update(schema.twoFactor)
+								.set({
+									failedVerificationCount: sql`case when ${schema.twoFactor.lockedUntil} <= timezone('UTC', now()) then 1 else ${schema.twoFactor.failedVerificationCount} + 1 end`,
+									lockedUntil: sql`case when ${schema.twoFactor.lockedUntil} is null and ${schema.twoFactor.failedVerificationCount} >= 9 then timezone('UTC', now()) + interval '15 minutes' end`,
+								})
+								.where(
+									and(
+										eq(schema.twoFactor.userId, session.user.id),
+										or(
+											isNull(schema.twoFactor.lockedUntil),
+											lte(schema.twoFactor.lockedUntil, new Date()),
+										),
+									),
+								)
+								.returning({ id: schema.twoFactor.id });
+							if (!attempt) {
+								throw new APIError("TOO_MANY_REQUESTS", {
+									message:
+										"No authenticator is available or the account is temporarily locked",
+								});
+							}
+						}
 					}
 				}
 
@@ -198,6 +341,77 @@ const createBetterAuth = () =>
 								"SSO is enforced. Direct password, social, and passkey sign-in are disabled.",
 						});
 					}
+				}
+			}),
+			after: createAuthMiddleware(async (ctx) => {
+				if (ctx.path === "/get-session" && ctx.request) {
+					const session = ctx.context.session;
+					if (session && !hasTwoFactorProof(session)) return ctx.json(null);
+				}
+				if (ctx.path !== verifyTotpPath && ctx.path !== verifyBackupCodePath)
+					return;
+				if (ctx.path === verifyBackupCodePath && ctx.body?.disableSession)
+					return;
+
+				const result = ctx.context.returned;
+				const newSession = ctx.context.newSession;
+				const verified = newSession ?? ctx.context.session;
+				if (
+					!result ||
+					typeof result !== "object" ||
+					!("token" in result) ||
+					typeof result.token !== "string" ||
+					!verified ||
+					verified.session.impersonatedBy
+				)
+					return;
+				if (hasTwoFactorProof(verified)) return;
+
+				// Replace a primary-only token so a copy of it cannot gain access after verification.
+				const token = newSession
+					? verified.session.token
+					: randomBytes(32).toString("hex");
+				const [session] = await db.transaction(async (tx) => {
+					const promoted = await tx
+						.update(schema.session)
+						.set({ token, twoFactorVerified: true })
+						.where(
+							and(
+								eq(schema.session.id, verified.session.id),
+								eq(schema.session.userId, verified.user.id),
+								eq(schema.session.token, verified.session.token),
+								eq(schema.session.twoFactorVerified, false),
+								twoFactorIsEnrolled(verified.user.id),
+								exists(
+									db
+										.select({ id: schema.user.id })
+										.from(schema.user)
+										.where(
+											and(
+												eq(schema.user.id, verified.user.id),
+												eq(schema.user.twoFactorEnabled, true),
+											),
+										),
+								),
+							),
+						)
+						.returning();
+					if (promoted.length) {
+						await tx
+							.update(schema.twoFactor)
+							.set({ failedVerificationCount: 0, lockedUntil: null })
+							.where(eq(schema.twoFactor.userId, verified.user.id));
+					}
+					return promoted;
+				});
+				if (!session)
+					throw new APIError("UNAUTHORIZED", {
+						message: "Could not verify this session. Sign in again.",
+					});
+
+				if (!newSession) {
+					await setSessionCookie(ctx, { session, user: verified.user });
+					return ctx.json({ ...result, token });
 				}
 			}),
 		},
@@ -489,6 +703,14 @@ const createBetterAuth = () =>
 		session: {
 			expiresIn: 60 * 60 * 24 * 3,
 			updateAge: 60 * 60 * 24,
+			cookieCache: { enabled: false },
+			additionalFields: {
+				twoFactorVerified: {
+					type: "boolean",
+					defaultValue: false,
+					input: false,
+				},
+			},
 		},
 		user: {
 			modelName: "user",
@@ -549,7 +771,7 @@ const createBetterAuth = () =>
 					}
 				},
 			}),
-			twoFactor(),
+			twoFactor({ allowPasswordless: true }),
 			passkey(),
 			organization({
 				ac,
@@ -597,6 +819,35 @@ const _auth = {
 export type AuthType = typeof _auth;
 export const auth: AuthType = _auth;
 
+const getBrowserSession = (request: IncomingMessage) =>
+	api.getSession({
+		headers: new Headers({ cookie: request.headers.cookie || "" }),
+		query: { disableCookieCache: true },
+	});
+
+export const getTwoFactorState = async (request: IncomingMessage) => {
+	const session = await getBrowserSession(request);
+	if (!session) return null;
+	if (session.session.impersonatedBy || session.user.banned)
+		return { step: "sign-out" } as const;
+	if (hasTwoFactorProof(session)) return { step: "complete" } as const;
+	if (session.user.twoFactorEnabled) return { step: "verify" } as const;
+
+	const credential = await db.query.account.findFirst({
+		columns: { id: true },
+		where: and(
+			eq(schema.account.userId, session.user.id),
+			eq(schema.account.providerId, "credential"),
+			isNotNull(schema.account.password),
+		),
+	});
+	return {
+		step: "enroll",
+		email: session.user.email,
+		requiresPassword: !!credential,
+	} as const;
+};
+
 export const validateRequest = async (request: IncomingMessage) => {
 	const apiKey = request.headers["x-api-key"] as string;
 	if (apiKey) {
@@ -618,13 +869,16 @@ export const validateRequest = async (request: IncomingMessage) => {
 			}
 
 			const apiKeyRecord = await db.query.apikey.findFirst({
-				where: eq(schema.apikey.id, key.id),
+				where: and(
+					eq(schema.apikey.id, key.id),
+					twoFactorIsEnrolled(key.referenceId),
+				),
 				with: {
 					user: true,
 				},
 			});
 
-			if (!apiKeyRecord) {
+			if (!apiKeyRecord?.user?.twoFactorEnabled || apiKeyRecord.user.banned) {
 				return {
 					session: null,
 					user: null,
@@ -699,13 +953,9 @@ export const validateRequest = async (request: IncomingMessage) => {
 	}
 
 	// If no API key, proceed with normal session validation
-	const session = await api.getSession({
-		headers: new Headers({
-			cookie: request.headers.cookie || "",
-		}),
-	});
+	const session = await getBrowserSession(request);
 
-	if (!session?.session || !session.user) {
+	if (!session || !hasTwoFactorProof(session)) {
 		return {
 			session: null,
 			user: null,

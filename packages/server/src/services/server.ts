@@ -1,12 +1,12 @@
-import { IS_CLOUD } from "@dokploy/server/constants";
-import { db } from "@dokploy/server/db";
+import { IS_CLOUD } from "@vieploy/server/constants";
+import { db } from "@vieploy/server/db";
 import {
 	type apiCreateServer,
 	member,
 	organization,
 	server,
-} from "@dokploy/server/db/schema";
-import { hasValidLicense } from "@dokploy/server/services/proprietary/license-key";
+} from "@vieploy/server/db/schema";
+import { hasValidLicense } from "@vieploy/server/services/proprietary/license-key";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq, isNotNull } from "drizzle-orm";
 import type { z } from "zod";

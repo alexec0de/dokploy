@@ -1,5 +1,5 @@
-import { db } from "@dokploy/server/db";
-import { organization } from "@dokploy/server/db/schema";
+import { db } from "@vieploy/server/db";
+import { organization } from "@vieploy/server/db/schema";
 import { eq } from "drizzle-orm";
 
 export const getSSOProviders = async () => {

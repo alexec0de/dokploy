@@ -1,6 +1,6 @@
-import type { apiRestoreBackup } from "@dokploy/server/db/schema";
-import type { Destination } from "@dokploy/server/services/destination";
-import type { Mariadb } from "@dokploy/server/services/mariadb";
+import type { apiRestoreBackup } from "@vieploy/server/db/schema";
+import type { Destination } from "@vieploy/server/services/destination";
+import type { Mariadb } from "@vieploy/server/services/mariadb";
 import { quote } from "shell-quote";
 import type { z } from "zod";
 import { getS3Credentials } from "../backups/utils";

@@ -8,7 +8,7 @@ import {
 import type {
 	DnsRecordType,
 	route53DnsConfigSchema,
-} from "@dokploy/server/db/schema";
+} from "@vieploy/server/db/schema";
 import type { z } from "zod";
 import type { DnsClient } from "./types";
 

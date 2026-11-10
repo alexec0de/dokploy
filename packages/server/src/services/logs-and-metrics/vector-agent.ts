@@ -1,17 +1,17 @@
-import { IS_CLOUD } from "@dokploy/server/constants";
+import { IS_CLOUD } from "@vieploy/server/constants";
 import {
 	findServerById,
 	getAccessibleServerIds,
 	type Server,
 	setServerProviderIds,
-} from "@dokploy/server/services/server";
-import { setWebServerProviderIds } from "@dokploy/server/services/web-server-settings";
+} from "@vieploy/server/services/server";
+import { setWebServerProviderIds } from "@vieploy/server/services/web-server-settings";
 import {
 	LOCAL_SERVER_NAME,
 	reconcileVectorAgent,
 	removeVectorAgent,
 	withVectorTargetLock,
-} from "@dokploy/server/setup/vector-setup";
+} from "@vieploy/server/setup/vector-setup";
 import { TRPCError } from "@trpc/server";
 import { assertProvidersBelongToOrg, type VectorTarget } from "./service";
 
@@ -20,7 +20,7 @@ const assertLocalAgentAllowed = (serverId: string | undefined) => {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
 			message:
-				"The Vector agent on the Dokploy host is not available in Dokploy Cloud",
+				"The Vector agent on the Vieploy host is not available in Vieploy Cloud",
 		});
 	}
 };

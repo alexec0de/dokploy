@@ -1,11 +1,9 @@
 # Upgrade Integration Test
 #
-# Tests that Dokploy can upgrade from version A to version B while keeping
+# Tests that Vieploy can upgrade from version A to version B while keeping
 # user projects (Postgres, MongoDB, two web apps, one static site) alive.
 #
-# Generates upgrade pairs: each stable tag in [floor_version, target_version)
-# is paired with target_version. If target_version is empty, the highest tag
-# available on Docker Hub is used as the target.
+# Upgrades eligible upstream releases to the selected Vieploy image.
 #
 # Only triggered manually to avoid burning Actions minutes.
 
@@ -19,12 +17,12 @@ on:
         required: false
         default: 'v0.29.4'
       target_version:
-        description: 'Target version to upgrade to (version B). Leave empty to use the highest available.'
+        description: 'Target tag for the Vieploy image'
         required: false
-        default: ''
+        default: 'feature'
 
 env:
-  DOKPLOY_IMAGE:   dokploy/dokploy
+  VIEPLOY_IMAGE:   ${{ vars.VIEPLOY_IMAGE }}
   DOKPLOY_SERVICE: dokploy
   DOKPLOY_PORT:    3000
 
@@ -65,14 +63,9 @@ jobs:
           echo "All tags found:"
           echo "$ALL_TAGS"
 
-          # Target version (version B): explicit input, else highest available.
-          if [ -n "$TARGET" ]; then
-            TO="$TARGET"
-            echo "Using user-supplied target version: $TO"
-          else
-            TO=$(echo "$ALL_TAGS" | tail -n1)
-            echo "No target supplied; using highest available: $TO"
-          fi
+          : "${VIEPLOY_IMAGE:?Configure the VIEPLOY_IMAGE repository variable}"
+          TO="${TARGET:-feature}"
+          [[ "$TO" =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$ ]]
 
           # Floor semver components
           FLOOR_CLEAN="${FLOOR#v}"
@@ -83,7 +76,9 @@ jobs:
           while read -r TAG; do
             [ -z "$TAG" ] && continue
             # skip tags above-or-equal to the target (incl. the target itself)
-            ge "$TAG" "$TO" && continue
+            if [[ "$TO" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] && ge "$TAG" "$TO"; then
+              continue
+            fi
             TAG_CLEAN="${TAG#v}"
             IFS='.' read -r T_MAJ T_MIN T_PAT <<< "$TAG_CLEAN"
             if [ "$T_MAJ" -gt "$F_MAJ" ] || \
@@ -124,7 +119,7 @@ jobs:
           docker system prune -af --volumes
           df -h
 
-      # ── Install Dokploy directly at VERSION A ──────────────────────────────
+      # ── Install upstream Dokploy at VERSION A ──────────────────────────────
       # install.sh:
       #   • requires root (run via sudo bash)
       #   • respects DOKPLOY_VERSION → installs that tag directly
@@ -132,7 +127,7 @@ jobs:
       #     running B's migrations on A's expected schema)
       #   • respects ADVERTISE_ADDR → skip the external IP lookup
       #   • initializes Docker Swarm + dokploy-network itself
-      - name: Install Dokploy at VERSION A (${{ matrix.pair.from }})
+      - name: Install upstream Dokploy at VERSION A (${{ matrix.pair.from }})
         run: |
           curl -fsSL https://dokploy.com/install.sh -o /tmp/install.sh
           chmod +x /tmp/install.sh
@@ -154,7 +149,7 @@ jobs:
           docker service ls
           echo "✅ Service running on ${{ matrix.pair.from }}"
 
-      - name: Wait for Dokploy API to accept requests
+      - name: Wait for Vieploy API to accept requests
         run: |
           timeout 180 bash -c '
             until curl -sf -o /dev/null \
@@ -162,7 +157,7 @@ jobs:
               sleep 3
             done
           '
-          echo "✅ Dokploy API is up"
+          echo "✅ Vieploy API is up"
 
       # ── Bootstrap admin user ───────────────────────────────────────────────
       - name: Register first admin user
@@ -332,10 +327,12 @@ jobs:
           echo "✅ All user services healthy before upgrade"
 
       # ── Upgrade ────────────────────────────────────────────────────────────
-      - name: Upgrade Dokploy to VERSION B (${{ matrix.pair.to }})
+      - name: Upgrade to Vieploy (${{ matrix.pair.to }})
+        env:
+          TARGET_TAG: ${{ matrix.pair.to }}
         run: |
           docker service update \
-            --image "${{ env.DOKPLOY_IMAGE }}:${{ matrix.pair.to }}" \
+            --image "$VIEPLOY_IMAGE:$TARGET_TAG" \
             --force \
             "${{ env.DOKPLOY_SERVICE }}"
 
@@ -354,7 +351,7 @@ jobs:
           '
           echo "✅ Service running on ${{ matrix.pair.to }}"
 
-      - name: Wait for Dokploy API to respond post-upgrade
+      - name: Wait for Vieploy API to respond post-upgrade
         run: |
           timeout 180 bash -c '
             until curl -sf -o /dev/null \
@@ -362,7 +359,25 @@ jobs:
               sleep 3
             done
           '
-          echo "✅ Dokploy API is up after upgrade"
+          echo "✅ Vieploy API is up after upgrade"
+
+      - name: Enroll the existing owner in mandatory 2FA
+        env:
+          BASE: "http://localhost:${{ env.DOKPLOY_PORT }}"
+          COOKIE: ${{ steps.auth.outputs.cookie_jar }}
+        run: |
+          set -euo pipefail
+          test "$(curl -sS -o /dev/null -w '%{redirect_url}' -b "$COOKIE" "$BASE/")" = "$BASE/two-factor"
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq oathtool
+          URI=$(curl -fsS -b "$COOKIE" -c "$COOKIE" -X POST "$BASE/api/auth/two-factor/enable" \
+            -H "Origin: $BASE" -H "Content-Type: application/json" \
+            -d '{"password":"CiTest1234!"}' | jq -er .totpURI)
+          SECRET=$(python3 -c 'import sys, urllib.parse as url; print(url.parse_qs(url.urlsplit(sys.stdin.read()).query)["secret"][0])' <<< "$URI")
+          CODE=$(oathtool --base32 --totp "$SECRET")
+          curl -fsS -b "$COOKIE" -c "$COOKIE" -X POST "$BASE/api/auth/two-factor/verify-totp" \
+            -H "Origin: $BASE" -H "Content-Type: application/json" \
+            -d "$(jq -n --arg code "$CODE" '{code: $code}')" >/dev/null
 
       # ── Post-upgrade health check ──────────────────────────────────────────
       - name: Verify all services still healthy (post-upgrade)

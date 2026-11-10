@@ -1,4 +1,4 @@
-import { db } from "@dokploy/server/db";
+import { db } from "@vieploy/server/db";
 import {
 	applications,
 	compose,
@@ -12,8 +12,8 @@ import {
 	postgres,
 	projects,
 	redis,
-} from "@dokploy/server/db/schema";
-import { hasValidLicense } from "@dokploy/server/services/proprietary/license-key";
+} from "@vieploy/server/db/schema";
+import { hasValidLicense } from "@vieploy/server/services/proprietary/license-key";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import {

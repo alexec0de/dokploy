@@ -1,7 +1,7 @@
 import {
 	execAsync,
 	execAsyncRemote,
-} from "@dokploy/server/utils/process/execAsync";
+} from "@vieploy/server/utils/process/execAsync";
 import { quote } from "shell-quote";
 
 export interface DockerImage {

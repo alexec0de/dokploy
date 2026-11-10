@@ -1,5 +1,5 @@
-import { findServerById } from "@dokploy/server/services/server";
-import { getWebServerSettings } from "@dokploy/server/services/web-server-settings";
+import { findServerById } from "@vieploy/server/services/server";
+import { getWebServerSettings } from "@vieploy/server/services/web-server-settings";
 import type { CreateServiceOptions } from "dockerode";
 import { IS_CLOUD } from "../constants";
 import { getDokployImageTag } from "../services/settings";

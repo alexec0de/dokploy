@@ -6,7 +6,7 @@ on:
       - canary
       - main
     paths:
-      - 'apps/dokploy/server/api/routers/**'
+      - 'apps/vieploy/server/api/routers/**'
       - 'packages/server/src/services/**'
       - 'packages/server/src/db/schema/**'
 
@@ -17,10 +17,10 @@ permissions:
 
 jobs:
   generate-and-commit:
-    name: Generate OpenAPI and commit to Dokploy repo
+    name: Generate OpenAPI and commit to Vieploy repo
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Dokploy repository
+      - name: Checkout Vieploy repository
         uses: actions/checkout@v7
         with:
           persist-credentials: false
@@ -61,7 +61,7 @@ jobs:
             exit 0
           fi
 
-          git config user.name "Dokploy Bot"
+          git config user.name "Vieploy Bot"
           git config user.email "bot@dokploy.com"
 
           # main is protected (PR + review + lint-and-typecheck), so sync through a reusable PR branch.
@@ -97,7 +97,7 @@ jobs:
             exit 0
           fi
 
-          git config user.name "Dokploy Bot"
+          git config user.name "Vieploy Bot"
           git config user.email "bot@dokploy.com"
 
           BRANCH=chore/sync-openapi
@@ -131,7 +131,7 @@ jobs:
             exit 0
           fi
 
-          git config user.name "Dokploy Bot"
+          git config user.name "Vieploy Bot"
           git config user.email "bot@dokploy.com"
 
           BRANCH=chore/sync-openapi
@@ -158,7 +158,7 @@ jobs:
 
           cp -f ../openapi.json openapi.json
 
-          git config user.name "Dokploy Bot"
+          git config user.name "Vieploy Bot"
           git config user.email "bot@dokploy.com"
 
           git add openapi.json

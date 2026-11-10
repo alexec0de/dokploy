@@ -1,5 +1,5 @@
-import { db } from "@dokploy/server/db";
-import { type apiCreatePort, ports } from "@dokploy/server/db/schema";
+import { db } from "@vieploy/server/db";
+import { type apiCreatePort, ports } from "@vieploy/server/db/schema";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import type { z } from "zod";

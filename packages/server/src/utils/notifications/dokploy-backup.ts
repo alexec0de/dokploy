@@ -1,6 +1,6 @@
-import { db } from "@dokploy/server/db";
-import { notifications } from "@dokploy/server/db/schema";
-import DokployBackupEmail from "@dokploy/server/emails/emails/dokploy-backup";
+import { db } from "@vieploy/server/db";
+import { notifications } from "@vieploy/server/db/schema";
+import DokployBackupEmail from "@vieploy/server/emails/emails/dokploy-backup";
 import { render } from "@react-email/components";
 import { format } from "date-fns";
 import { eq } from "drizzle-orm";
@@ -80,7 +80,7 @@ export const sendDokployBackupNotifications = async ({
 				if (email) {
 					await sendEmailNotification(
 						email,
-						"Dokploy instance backup",
+						"Vieploy instance backup",
 						template,
 					);
 				}
@@ -88,7 +88,7 @@ export const sendDokployBackupNotifications = async ({
 				if (resend) {
 					await sendResendNotification(
 						resend,
-						"Dokploy instance backup",
+						"Vieploy instance backup",
 						template,
 					);
 				}
@@ -101,13 +101,13 @@ export const sendDokployBackupNotifications = async ({
 				await sendDiscordNotification(discord, {
 					title:
 						type === "success"
-							? decorate(">", "`✅` Dokploy Backup Successful")
-							: decorate(">", "`❌` Dokploy Backup Failed"),
+							? decorate(">", "`✅` Vieploy Backup Successful")
+							: decorate(">", "`❌` Vieploy Backup Failed"),
 					color: type === "success" ? 0x57f287 : 0xed4245,
 					fields: [
 						{
 							name: decorate("`📦`", "Backup Type"),
-							value: "Complete Dokploy Instance",
+							value: "Complete Vieploy Instance",
 							inline: true,
 						},
 						...(backupSize
@@ -147,7 +147,7 @@ export const sendDokployBackupNotifications = async ({
 					],
 					timestamp: date.toISOString(),
 					footer: {
-						text: "Dokploy Instance Backup Notification",
+						text: "Vieploy Instance Backup Notification",
 					},
 				});
 			}
@@ -160,9 +160,9 @@ export const sendDokployBackupNotifications = async ({
 					gotify,
 					decorate(
 						type === "success" ? "✅" : "❌",
-						`Dokploy Backup ${type === "success" ? "Successful" : "Failed"}`,
+						`Vieploy Backup ${type === "success" ? "Successful" : "Failed"}`,
 					),
-					`${decorate("📦", "Backup Type: Complete Dokploy Instance")}` +
+					`${decorate("📦", "Backup Type: Complete Vieploy Instance")}` +
 						`${backupSize ? decorate("💾", `Backup Size: ${backupSize}`) : ""}` +
 						`${decorate("🕒", `Date: ${date.toLocaleString()}`)}` +
 						`${type === "error" && errorMessage ? decorate("❌", `Error:\n${errorMessage}`) : ""}`,
@@ -172,10 +172,10 @@ export const sendDokployBackupNotifications = async ({
 			if (ntfy) {
 				await sendNtfyNotification(
 					ntfy,
-					`Dokploy Backup ${type === "success" ? "Successful" : "Failed"}`,
+					`Vieploy Backup ${type === "success" ? "Successful" : "Failed"}`,
 					`${type === "success" ? "white_check_mark" : "x"}`,
 					"",
-					"📦Backup Type: Complete Dokploy Instance\n" +
+					"📦Backup Type: Complete Vieploy Instance\n" +
 						`${backupSize ? `💾Backup Size: ${backupSize}\n` : ""}` +
 						`🕒Date: ${date.toLocaleString()}\n` +
 						`${type === "error" && errorMessage ? `❌Error:\n${errorMessage}` : ""}`,
@@ -194,7 +194,7 @@ export const sendDokployBackupNotifications = async ({
 					? `\n<b>Backup Size:</b> ${escapeHtml(backupSize)}`
 					: "";
 
-				const messageText = `<b>${statusEmoji} Dokploy Backup ${typeStatus}</b>\n\n<b>Backup Type:</b> Complete Dokploy Instance${sizeInfo}\n<b>Date:</b> ${format(date, "PP")}\n<b>Time:</b> ${format(date, "pp")}${isError ? errorMsg : ""}`;
+				const messageText = `<b>${statusEmoji} Vieploy Backup ${typeStatus}</b>\n\n<b>Backup Type:</b> Complete Vieploy Instance${sizeInfo}\n<b>Date:</b> ${format(date, "PP")}\n<b>Time:</b> ${format(date, "pp")}${isError ? errorMsg : ""}`;
 
 				await sendTelegramNotification(telegram, messageText);
 			}
@@ -208,8 +208,8 @@ export const sendDokployBackupNotifications = async ({
 							color: type === "success" ? "#00FF00" : "#FF0000",
 							pretext:
 								type === "success"
-									? ":white_check_mark: *Dokploy Backup Successful*"
-									: ":x: *Dokploy Backup Failed*",
+									? ":white_check_mark: *Vieploy Backup Successful*"
+									: ":x: *Vieploy Backup Failed*",
 							fields: [
 								...(type === "error" && errorMessage
 									? [
@@ -222,7 +222,7 @@ export const sendDokployBackupNotifications = async ({
 									: []),
 								{
 									title: "Backup Type",
-									value: "Complete Dokploy Instance",
+									value: "Complete Vieploy Instance",
 									short: true,
 								},
 								...(backupSize
@@ -278,8 +278,8 @@ export const sendDokployBackupNotifications = async ({
 								tag: "plain_text",
 								content:
 									type === "success"
-										? "✅ Dokploy Backup Successful"
-										: "❌ Dokploy Backup Failed",
+										? "✅ Vieploy Backup Successful"
+										: "❌ Vieploy Backup Failed",
 							},
 							subtitle: {
 								tag: "plain_text",
@@ -302,7 +302,7 @@ export const sendDokployBackupNotifications = async ({
 												{
 													tag: "markdown",
 													content:
-														"**Backup Type:**\nComplete Dokploy Instance",
+														"**Backup Type:**\nComplete Vieploy Instance",
 													text_align: "left",
 													text_size: "normal_v2",
 												},
@@ -362,21 +362,21 @@ export const sendDokployBackupNotifications = async ({
 				const statusEmoji = type === "success" ? ":white_check_mark:" : ":x:";
 				const typeStatus = type === "success" ? "Successful" : "Failed";
 				await sendMattermostNotification(mattermost, {
-					text: `${statusEmoji} **Dokploy Backup ${typeStatus}**
+					text: `${statusEmoji} **Vieploy Backup ${typeStatus}**
 
-**Backup Type:** Complete Dokploy Instance${backupSize ? `\n**Backup Size:** ${backupSize}` : ""}
+**Backup Type:** Complete Vieploy Instance${backupSize ? `\n**Backup Size:** ${backupSize}` : ""}
 **Date:** ${date.toLocaleString()}
 **Status:** ${typeStatus}${type === "error" && errorMessage ? `\n\n**Error:**\n\`\`\`\n${errorMessage}\n\`\`\`` : ""}`,
 					channel: mattermost.channel,
-					username: mattermost.username || "Dokploy Bot",
+					username: mattermost.username || "Vieploy Bot",
 				});
 			}
 
 			if (custom) {
 				await sendCustomNotification(custom, {
-					title: `Dokploy Backup ${type === "success" ? "Successful" : "Failed"}`,
-					message: `Dokploy instance backup ${type === "success" ? "completed successfully" : "failed"}`,
-					backupType: "Complete Dokploy Instance",
+					title: `Vieploy Backup ${type === "success" ? "Successful" : "Failed"}`,
+					message: `Vieploy instance backup ${type === "success" ? "completed successfully" : "failed"}`,
+					backupType: "Complete Vieploy Instance",
 					...(backupSize ? { backupSize } : {}),
 					...(type === "error" && errorMessage ? { errorMessage } : {}),
 					timestamp: date.toISOString(),
@@ -389,16 +389,16 @@ export const sendDokployBackupNotifications = async ({
 			if (pushover) {
 				await sendPushoverNotification(
 					pushover,
-					`Dokploy Backup ${type === "success" ? "Successful" : "Failed"}`,
-					`Backup Type: Complete Dokploy Instance${backupSize ? `\nBackup Size: ${backupSize}` : ""}\nDate: ${date.toLocaleString()}${type === "error" && errorMessage ? `\nError: ${errorMessage}` : ""}`,
+					`Vieploy Backup ${type === "success" ? "Successful" : "Failed"}`,
+					`Backup Type: Complete Vieploy Instance${backupSize ? `\nBackup Size: ${backupSize}` : ""}\nDate: ${date.toLocaleString()}${type === "error" && errorMessage ? `\nError: ${errorMessage}` : ""}`,
 				);
 			}
 
 			if (teams) {
 				await sendTeamsNotification(teams, {
-					title: `${type === "success" ? "✅" : "❌"} Dokploy Backup ${type === "success" ? "Successful" : "Failed"}`,
+					title: `${type === "success" ? "✅" : "❌"} Vieploy Backup ${type === "success" ? "Successful" : "Failed"}`,
 					facts: [
-						{ name: "Backup Type", value: "Complete Dokploy Instance" },
+						{ name: "Backup Type", value: "Complete Vieploy Instance" },
 						...(backupSize ? [{ name: "Backup Size", value: backupSize }] : []),
 						{ name: "Date", value: format(date, "PP pp") },
 						{

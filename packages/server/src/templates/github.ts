@@ -1,4 +1,4 @@
-import { providerFetch } from "@dokploy/server/services/logs-and-metrics/provider-fetch";
+import { providerFetch } from "@vieploy/server/services/logs-and-metrics/provider-fetch";
 import { parse } from "toml";
 
 /**

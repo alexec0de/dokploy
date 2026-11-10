@@ -1,12 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
-import { paths } from "@dokploy/server/constants";
-import { db } from "@dokploy/server/db";
+import { paths } from "@vieploy/server/constants";
+import { db } from "@vieploy/server/db";
 import {
 	type apiCreateCertificate,
 	certificates,
-} from "@dokploy/server/db/schema";
-import { removeDirectoryIfExistsContent } from "@dokploy/server/utils/filesystem/directory";
+} from "@vieploy/server/db/schema";
+import { removeDirectoryIfExistsContent } from "@vieploy/server/utils/filesystem/directory";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { quote } from "shell-quote";

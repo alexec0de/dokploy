@@ -1,11 +1,11 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Dokploy API",
-    "description": "Complete API documentation for Dokploy - Deploy applications, manage databases, and orchestrate your infrastructure. This API allows you to programmatically manage all aspects of your Dokploy instance.",
+    "title": "Vieploy API",
+    "description": "Complete API documentation for Vieploy - Deploy applications, manage databases, and orchestrate your infrastructure. This API allows you to programmatically manage all aspects of your Vieploy instance.",
     "version": "1.0.0",
     "contact": {
-      "name": "Dokploy Team",
+      "name": "Vieploy Team",
       "url": "https://dokploy.com"
     },
     "license": {
@@ -15,7 +15,7 @@
   },
   "servers": [
     {
-      "url": "https://your-dokploy-instance.com/api"
+      "url": "https://your-vieploy-instance.com/api"
     }
   ],
   "tags": [
@@ -60400,7 +60400,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "x-api-key",
-        "description": "API key authentication. Generate an API key from your Dokploy dashboard under Settings > API Keys."
+        "description": "API key authentication. Generate an API key from your Vieploy dashboard under Settings > API Keys."
       }
     }
   },

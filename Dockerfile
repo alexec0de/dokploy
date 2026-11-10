@@ -17,15 +17,15 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 # Deploy only the dokploy app
 
 ENV NODE_ENV=production
-RUN pnpm --filter=@dokploy/server build
-RUN pnpm --filter=./apps/dokploy run build
+RUN pnpm --filter=@vieploy/server build
+RUN pnpm --filter=./apps/vieploy run build
 
-RUN pnpm --filter=./apps/dokploy --prod deploy --legacy /prod/dokploy
+RUN pnpm --filter=./apps/vieploy --prod deploy --legacy /prod/vieploy
 
-RUN cp -R /usr/src/app/apps/dokploy/.next /prod/dokploy/.next
-RUN cp -R /usr/src/app/apps/dokploy/dist /prod/dokploy/dist
+RUN cp -R /usr/src/app/apps/vieploy/.next /prod/vieploy/.next
+RUN cp -R /usr/src/app/apps/vieploy/dist /prod/vieploy/dist
 
-FROM base AS dokploy
+FROM base AS vieploy
 WORKDIR /app
 
 # Set production
@@ -34,15 +34,15 @@ ENV NODE_ENV=production
 RUN apt-get update && apt-get install -y tini curl unzip zip apache2-utils iproute2 rsync git-lfs && git lfs install && rm -rf /var/lib/apt/lists/*
 
 # Copy only the necessary files
-COPY --from=build /prod/dokploy/.next ./.next
-COPY --from=build /prod/dokploy/dist ./dist
-COPY --from=build /prod/dokploy/next.config.mjs ./next.config.mjs
-COPY --from=build /prod/dokploy/public ./public
-COPY --from=build /prod/dokploy/package.json ./package.json
-COPY --from=build /prod/dokploy/drizzle ./drizzle
+COPY --from=build /prod/vieploy/.next ./.next
+COPY --from=build /prod/vieploy/dist ./dist
+COPY --from=build /prod/vieploy/next.config.mjs ./next.config.mjs
+COPY --from=build /prod/vieploy/public ./public
+COPY --from=build /prod/vieploy/package.json ./package.json
+COPY --from=build /prod/vieploy/drizzle ./drizzle
 COPY .env.production ./.env
-COPY --from=build /prod/dokploy/components.json ./components.json
-COPY --from=build /prod/dokploy/node_modules ./node_modules
+COPY --from=build /prod/vieploy/components.json ./components.json
+COPY --from=build /prod/vieploy/node_modules ./node_modules
 
 
 # Install docker

@@ -1,21 +1,21 @@
 import path from "node:path";
-import { paths } from "@dokploy/server/constants";
-import { db } from "@dokploy/server/db";
+import { paths } from "@vieploy/server/constants";
+import { db } from "@vieploy/server/db";
 import {
 	type apiCreateMount,
 	mounts,
 	type ServiceType,
-} from "@dokploy/server/db/schema";
+} from "@vieploy/server/db/schema";
 import {
 	createFile,
 	getCreateFileCommand,
 	isValidMountFilePath,
-} from "@dokploy/server/utils/docker/utils";
-import { removeFileOrDirectory } from "@dokploy/server/utils/filesystem/directory";
+} from "@vieploy/server/utils/docker/utils";
+import { removeFileOrDirectory } from "@vieploy/server/utils/filesystem/directory";
 import {
 	execAsync,
 	execAsyncRemote,
-} from "@dokploy/server/utils/process/execAsync";
+} from "@vieploy/server/utils/process/execAsync";
 import { TRPCError } from "@trpc/server";
 import { eq, type SQL, sql } from "drizzle-orm";
 import { quote } from "shell-quote";

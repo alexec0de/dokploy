@@ -1,23 +1,23 @@
-import { IS_CLOUD, paths } from "@dokploy/server/constants";
+import { IS_CLOUD, paths } from "@vieploy/server/constants";
 import {
 	findEnabledTelemetryProvidersByOrganization,
 	findTelemetryProvidersByOrganization,
 	type TelemetryProvider,
 	toRuntimeConfig,
-} from "@dokploy/server/services/logs-and-metrics/service";
+} from "@vieploy/server/services/logs-and-metrics/service";
 import {
 	findServerById,
 	findServersByOrganizationForVectorAgent,
 	getAccessibleServerIds,
-} from "@dokploy/server/services/server";
-import { getWebServerSettings } from "@dokploy/server/services/web-server-settings";
-import { encodeBase64 } from "@dokploy/server/utils/docker/utils";
-import { ExecError } from "@dokploy/server/utils/process/ExecError";
+} from "@vieploy/server/services/server";
+import { getWebServerSettings } from "@vieploy/server/services/web-server-settings";
+import { encodeBase64 } from "@vieploy/server/utils/docker/utils";
+import { ExecError } from "@vieploy/server/utils/process/ExecError";
 import {
 	execAsync,
 	execAsyncRemote,
-} from "@dokploy/server/utils/process/execAsync";
-import { getRemoteDocker } from "@dokploy/server/utils/servers/remote-docker";
+} from "@vieploy/server/utils/process/execAsync";
+import { getRemoteDocker } from "@vieploy/server/utils/servers/remote-docker";
 import type Dockerode from "dockerode";
 import type { ContainerSpec, CreateServiceOptions } from "dockerode";
 import { nanoid } from "nanoid";
@@ -41,7 +41,7 @@ export const CADVISOR_IMAGE = "ghcr.io/google/cadvisor:v0.60.6";
 export const CADVISOR_SERVICE_NAME = "dokploy-cadvisor";
 export const CADVISOR_PORT = 4510;
 export const METRICS_SCRAPE_INTERVAL_SECS = 30;
-export const LOCAL_SERVER_NAME = "Dokploy Server (local)";
+export const LOCAL_SERVER_NAME = "Vieploy Server (local)";
 
 const DOKPLOY_LABELS = [
 	"dokploy.organization.id",
@@ -570,7 +570,7 @@ export const removeCadvisorService = async (serverId?: string) => {
 
 const vectorTargetLocks = new Map<string, Promise<unknown>>();
 
-// In-process only: Dokploy runs a single dashboard process per host.
+// In-process only: Vieploy runs a single dashboard process per host.
 export const withVectorTargetLock = async <T>(
 	serverId: string | undefined,
 	fn: () => Promise<T>,

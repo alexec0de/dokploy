@@ -223,7 +223,7 @@ export const configureFail2ban = async (
 		...new Set([...(await getPanelIps()), ...config.ignoreip]),
 	].filter(isIpOrCidr);
 
-	const jailConfig = `# Managed by Dokploy
+	const jailConfig = `# Managed by Vieploy
 [DEFAULT]
 bantime = ${Math.trunc(config.bantime)}
 findtime = ${Math.trunc(config.findtime)}
@@ -236,7 +236,7 @@ banaction_allports = __BANACTION_ALLPORTS__
 enabled = true
 port = __SSH_PORT__
 
-# Holds IPs banned by hand from Dokploy: never matches logs, bans on every port until unbanned
+# Holds IPs banned by hand from Vieploy: never matches logs, bans on every port until unbanned
 [${FAIL2BAN_MANUAL_JAIL}]
 enabled = true
 filter =
@@ -246,7 +246,7 @@ banaction = %(banaction_allports)s
 bantime = -1
 `;
 	// The default 1 day purge would drop permanent bans from the database on the next restart
-	const daemonConfig = `# Managed by Dokploy
+	const daemonConfig = `# Managed by Vieploy
 [Definition]
 dbpurgeage = 3650d
 `;
@@ -336,14 +336,14 @@ export const banFail2banIp = async (serverId: string, ip: string) => {
 	if (!isIp(ip)) throw new Error("Invalid IP address");
 	if ((await getPanelIps()).includes(ip)) {
 		throw new Error(
-			"This is the IP of the Dokploy panel. Banning it would cut Dokploy off from the server",
+			"This is the IP of the Vieploy panel. Banning it would cut Vieploy off from the server",
 		);
 	}
 	await runRemote(
 		serverId,
 		`
 if ! $SUDO fail2ban-client status ${FAIL2BAN_MANUAL_JAIL} >/dev/null 2>&1; then
-	echo "Save the Fail2ban configuration from Dokploy before banning IPs manually" >&2
+	echo "Save the Fail2ban configuration from Vieploy before banning IPs manually" >&2
 	exit 1
 fi
 $SUDO fail2ban-client set ${FAIL2BAN_MANUAL_JAIL} banip ${quote([ip])} >/dev/null
@@ -369,7 +369,7 @@ const KNOWN_PORTS: Record<string, { label: string; risk: PortRisk }> = {
 	"tcp/3306": { label: "MySQL / MariaDB", risk: "high" },
 	"tcp/27017": { label: "MongoDB", risk: "high" },
 	"tcp/6379": { label: "Redis", risk: "high" },
-	"tcp/4500": { label: "Dokploy monitoring", risk: "info" },
+	"tcp/4500": { label: "Vieploy monitoring", risk: "info" },
 };
 
 export interface ExposedPort {
@@ -634,11 +634,11 @@ export const updateSshSettings = async (
 	const server = await findServerById(serverId);
 	if (server.username === "root" && settings.permitRootLogin === "no") {
 		throw new Error(
-			"Dokploy connects to this server as root. Use 'prohibit-password' instead of disabling root login, or connect with a sudo user first",
+			"Vieploy connects to this server as root. Use 'prohibit-password' instead of disabling root login, or connect with a sudo user first",
 		);
 	}
 
-	const dropin = `# Managed by Dokploy
+	const dropin = `# Managed by Vieploy
 PasswordAuthentication ${settings.passwordAuthentication ? "yes" : "no"}
 ChallengeResponseAuthentication ${settings.passwordAuthentication ? "yes" : "no"}
 PermitRootLogin ${settings.permitRootLogin}
@@ -704,7 +704,7 @@ $SUDO systemctl reload ssh 2>/dev/null || $SUDO systemctl reload sshd
 `,
 	);
 
-	// A fresh connection proves the new config still lets Dokploy in; without it the server reverts on its own.
+	// A fresh connection proves the new config still lets Vieploy in; without it the server reverts on its own.
 	// Retried because sshd can refuse connections for a moment while it reloads.
 	for (let attempt = 1; attempt <= SSH_CONFIRM_ATTEMPTS; attempt++) {
 		await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -717,7 +717,7 @@ $SUDO systemctl reload ssh 2>/dev/null || $SUDO systemctl reload sshd
 		} catch {}
 	}
 	throw new Error(
-		`Dokploy could not reconnect after applying the SSH settings. They will be reverted automatically within ${SSH_REVERT_DELAY_SECONDS} seconds`,
+		`Vieploy could not reconnect after applying the SSH settings. They will be reverted automatically within ${SSH_REVERT_DELAY_SECONDS} seconds`,
 	);
 };
 
@@ -734,7 +734,7 @@ export const removeAuthorizedKey = async (
 		getDokployKeyFingerprint(server.sshKey) === fingerprint
 	) {
 		throw new Error(
-			"This is the key Dokploy uses to connect to the server and can't be removed",
+			"This is the key Vieploy uses to connect to the server and can't be removed",
 		);
 	}
 

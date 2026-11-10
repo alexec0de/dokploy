@@ -4,7 +4,6 @@ import {
 	Head,
 	Heading,
 	Html,
-	Img,
 	Link,
 	Preview,
 	Section,
@@ -33,13 +32,9 @@ export const AccountDeletionCodeTemplate = ({
 				<Body className="bg-[#f4f4f5] my-auto mx-auto font-sans">
 					<Container className="my-[40px] mx-auto max-w-[520px]">
 						<Section className="bg-[#09090b] rounded-t-xl px-[40px] py-[32px] text-center">
-							<Img
-								src="https://raw.githubusercontent.com/Dokploy/website/refs/heads/main/apps/docs/public/logo-dokploy-blackpng.png"
-								width="190"
-								height="120"
-								alt="Dokploy"
-								className="my-0 mx-auto"
-							/>
+							<Text className="text-white text-[26px] font-bold text-center my-0">
+								Vieploy
+							</Text>
 						</Section>
 
 						<Section className="bg-white px-[40px] py-[32px]">
@@ -48,7 +43,7 @@ export const AccountDeletionCodeTemplate = ({
 							</Heading>
 							<Text className="text-[#71717a] text-[14px] leading-[22px] m-0 mb-[24px]">
 								Hello {userName}, we received a request to permanently delete
-								your Dokploy account. Enter the code below to confirm it.
+								your Vieploy account. Enter the code below to confirm it.
 							</Text>
 
 							<Section className="text-center mb-[24px]">
@@ -72,7 +67,7 @@ export const AccountDeletionCodeTemplate = ({
 									href="https://dokploy.com"
 									className="text-[#71717a] underline"
 								>
-									Dokploy support
+									Vieploy support
 								</Link>
 								.
 							</Text>

@@ -22,7 +22,7 @@
 		"outDir": "./dist",
 		/* Path Aliases */
 		"paths": {
-			"@dokploy/server/*": ["./src/*"]
+			"@vieploy/server/*": ["./src/*"]
 		}
 	},
 	"include": ["next-env.d.ts", "./src/**/*.ts"],

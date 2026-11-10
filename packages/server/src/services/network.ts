@@ -1,5 +1,5 @@
-import { db } from "@dokploy/server/db";
-import { type apiCreateNetwork, network } from "@dokploy/server/db/schema";
+import { db } from "@vieploy/server/db";
+import { type apiCreateNetwork, network } from "@vieploy/server/db/schema";
 import { TRPCError } from "@trpc/server";
 import type Dockerode from "dockerode";
 import { and, eq, inArray, isNull } from "drizzle-orm";

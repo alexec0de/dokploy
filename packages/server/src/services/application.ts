@@ -1,32 +1,32 @@
-import { docker } from "@dokploy/server/constants";
-import { db } from "@dokploy/server/db";
+import { docker } from "@vieploy/server/constants";
+import { db } from "@vieploy/server/db";
 import {
 	type apiCreateApplication,
 	applications,
 	buildAppName,
-} from "@dokploy/server/db/schema";
-import { getAdvancedStats } from "@dokploy/server/monitoring/utils";
+} from "@vieploy/server/db/schema";
+import { getAdvancedStats } from "@vieploy/server/monitoring/utils";
 import {
 	getBuildCommand,
 	mechanizeDockerContainer,
-} from "@dokploy/server/utils/builders";
-import { sendBuildErrorNotifications } from "@dokploy/server/utils/notifications/build-error";
-import { getBuildErrorMessage } from "@dokploy/server/utils/notifications/build-error-message";
-import { sendBuildSuccessNotifications } from "@dokploy/server/utils/notifications/build-success";
+} from "@vieploy/server/utils/builders";
+import { sendBuildErrorNotifications } from "@vieploy/server/utils/notifications/build-error";
+import { getBuildErrorMessage } from "@vieploy/server/utils/notifications/build-error-message";
+import { sendBuildSuccessNotifications } from "@vieploy/server/utils/notifications/build-success";
 import {
 	execAsync,
 	execAsyncRemote,
-} from "@dokploy/server/utils/process/execAsync";
-import { cloneBitbucketRepository } from "@dokploy/server/utils/providers/bitbucket";
-import { buildRemoteDocker } from "@dokploy/server/utils/providers/docker";
+} from "@vieploy/server/utils/process/execAsync";
+import { cloneBitbucketRepository } from "@vieploy/server/utils/providers/bitbucket";
+import { buildRemoteDocker } from "@vieploy/server/utils/providers/docker";
 import {
 	cloneGitRepository,
 	getGitCommitInfo,
-} from "@dokploy/server/utils/providers/git";
-import { cloneGiteaRepository } from "@dokploy/server/utils/providers/gitea";
-import { cloneGithubRepository } from "@dokploy/server/utils/providers/github";
-import { cloneGitlabRepository } from "@dokploy/server/utils/providers/gitlab";
-import { createTraefikConfig } from "@dokploy/server/utils/traefik/application";
+} from "@vieploy/server/utils/providers/git";
+import { cloneGiteaRepository } from "@vieploy/server/utils/providers/gitea";
+import { cloneGithubRepository } from "@vieploy/server/utils/providers/github";
+import { cloneGitlabRepository } from "@vieploy/server/utils/providers/gitlab";
+import { createTraefikConfig } from "@vieploy/server/utils/traefik/application";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import type { z } from "zod";
@@ -398,7 +398,7 @@ export const deployPreviewApplication = async ({
 		);
 		await updateIssueComment({
 			...issueParams,
-			body: `### Dokploy Preview Deployment\n\n${buildingComment}`,
+			body: `### Vieploy Preview Deployment\n\n${buildingComment}`,
 		});
 		application.appName = previewDeployment.appName;
 		application.env = `${application.previewEnv}\nDOKPLOY_DEPLOY_URL=${previewDeployment?.domain?.host}`;
@@ -433,7 +433,7 @@ export const deployPreviewApplication = async ({
 		);
 		await updateIssueComment({
 			...issueParams,
-			body: `### Dokploy Preview Deployment\n\n${successComment}`,
+			body: `### Vieploy Preview Deployment\n\n${successComment}`,
 		});
 		await updateDeploymentStatus(deployment.deploymentId, "done");
 		await updatePreviewDeployment(previewDeploymentId, {
@@ -443,7 +443,7 @@ export const deployPreviewApplication = async ({
 		const comment = getIssueComment(application.name, "error", previewDomain);
 		await updateIssueComment({
 			...issueParams,
-			body: `### Dokploy Preview Deployment\n\n${comment}`,
+			body: `### Vieploy Preview Deployment\n\n${comment}`,
 		});
 		await updateDeploymentStatus(deployment.deploymentId, "error");
 		await updatePreviewDeployment(previewDeploymentId, {
@@ -515,7 +515,7 @@ export const rebuildPreviewApplication = async ({
 		);
 		await updateIssueComment({
 			...issueParams,
-			body: `### Dokploy Preview Deployment\n\n${buildingComment}`,
+			body: `### Vieploy Preview Deployment\n\n${buildingComment}`,
 		});
 
 		// Set application properties for preview deployment
@@ -545,7 +545,7 @@ export const rebuildPreviewApplication = async ({
 		);
 		await updateIssueComment({
 			...issueParams,
-			body: `### Dokploy Preview Deployment\n\n${successComment}`,
+			body: `### Vieploy Preview Deployment\n\n${successComment}`,
 		});
 		await updateDeploymentStatus(deployment.deploymentId, "done");
 		await updatePreviewDeployment(previewDeploymentId, {
@@ -558,7 +558,7 @@ export const rebuildPreviewApplication = async ({
 		const comment = getIssueComment(application.name, "error", previewDomain);
 		await updateIssueComment({
 			...issueParams,
-			body: `### Dokploy Preview Deployment\n\n${comment}`,
+			body: `### Vieploy Preview Deployment\n\n${comment}`,
 		});
 		await updateDeploymentStatus(deployment.deploymentId, "error");
 		await updatePreviewDeployment(previewDeploymentId, {

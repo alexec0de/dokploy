@@ -23,10 +23,10 @@ jobs:
 
       - name: Bump patch version and push
         run: |
-          git config user.name "Dokploy Bot"
+          git config user.name "Vieploy Bot"
           git config user.email "bot@dokploy.com"
-          CURRENT=$(node -p "require('./apps/dokploy/package.json').version")
+          CURRENT=$(node -p "require('./apps/vieploy/package.json').version")
           NEW=$(echo "$CURRENT" | awk -F. -v OFS=. '{$NF++; print}')
-          sed -i "s/\"version\": \"$CURRENT\"/\"version\": \"$NEW\"/" apps/dokploy/package.json
+          sed -i "s/\"version\": \"$CURRENT\"/\"version\": \"$NEW\"/" apps/vieploy/package.json
           git commit -am "chore: release ${NEW}"
           git push origin main

@@ -2,17 +2,17 @@ import { createWriteStream } from "node:fs";
 import { mkdtemp, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { IS_CLOUD, paths } from "@dokploy/server/constants";
+import { IS_CLOUD, paths } from "@vieploy/server/constants";
 import {
 	ENCRYPTION_KEY_BACKUP_FILE,
 	exportEncryptionKeys,
-} from "@dokploy/server/lib/encryption";
-import type { BackupSchedule } from "@dokploy/server/services/backup";
+} from "@vieploy/server/lib/encryption";
+import type { BackupSchedule } from "@vieploy/server/services/backup";
 import {
 	createDeploymentBackup,
 	updateDeploymentStatus,
-} from "@dokploy/server/services/deployment";
-import { findDestinationById } from "@dokploy/server/services/destination";
+} from "@vieploy/server/services/deployment";
+import { findDestinationById } from "@vieploy/server/services/destination";
 import { sendDokployBackupNotifications } from "../notifications/dokploy-backup";
 import { execAsync } from "../process/execAsync";
 import { redactRcloneCredentials } from "./redact";
@@ -60,12 +60,12 @@ export const runWebServerBackup = async (backup: BackupSchedule) => {
 			);
 
 			if (!containerId) {
-				writeStream.write("Dokploy postgres container not found❌\n");
+				writeStream.write("Vieploy postgres container not found❌\n");
 				writeStream.end();
-				throw new Error("Dokploy postgres container not found");
+				throw new Error("Vieploy postgres container not found");
 			}
 
-			writeStream.write(`Dokploy postgres container ID: ${containerId}\n`);
+			writeStream.write(`Vieploy postgres container ID: ${containerId}\n`);
 
 			const postgresContainerId = containerId.trim();
 

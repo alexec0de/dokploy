@@ -1,7 +1,7 @@
 import { join, resolve, sep } from "node:path";
-import { paths } from "@dokploy/server/constants";
-import { db } from "@dokploy/server/db";
-import { type apiCreatePatch, patch } from "@dokploy/server/db/schema";
+import { paths } from "@vieploy/server/constants";
+import { db } from "@vieploy/server/db";
+import { type apiCreatePatch, patch } from "@vieploy/server/db/schema";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { quote } from "shell-quote";

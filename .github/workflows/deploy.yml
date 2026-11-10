@@ -21,7 +21,7 @@ jobs:
       - name: Set tag and version
         id: meta-cloud
         run: |
-          VERSION=$(jq -r .version apps/dokploy/package.json)
+          VERSION=$(jq -r .version apps/vieploy/package.json)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           if [ "$GITHUB_REF" = "refs/heads/main" ]; then
             echo "tags=siumauricio/cloud:latest,siumauricio/cloud:${VERSION}" >> "$GITHUB_OUTPUT"
@@ -60,7 +60,7 @@ jobs:
       - name: Set tag and version
         id: meta-schedule
         run: |
-          VERSION=$(jq -r .version apps/dokploy/package.json)
+          VERSION=$(jq -r .version apps/vieploy/package.json)
           if [ "$GITHUB_REF" = "refs/heads/main" ]; then
             echo "tags=siumauricio/schedule:latest,siumauricio/schedule:${VERSION}" >> "$GITHUB_OUTPUT"
           else
@@ -94,7 +94,7 @@ jobs:
       - name: Set tag and version
         id: meta-server
         run: |
-          VERSION=$(jq -r .version apps/dokploy/package.json)
+          VERSION=$(jq -r .version apps/vieploy/package.json)
           if [ "$GITHUB_REF" = "refs/heads/main" ]; then
             echo "tags=siumauricio/server:latest,siumauricio/server:${VERSION}" >> "$GITHUB_OUTPUT"
           else

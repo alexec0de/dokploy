@@ -101,9 +101,9 @@ export const awsCloudwatchAdapter: TelemetryProviderAdapter = {
 			type: "text",
 			required: true,
 			signal: "metrics",
-			placeholder: "Dokploy",
+			placeholder: "Vieploy",
 			helpText:
-				"E.g. Dokploy. Cannot start with AWS/. The IAM user needs cloudwatch:PutMetricData; testing the connection writes a real data point.",
+				"E.g. Vieploy. Cannot start with AWS/. The IAM user needs cloudwatch:PutMetricData; testing the connection writes a real data point.",
 			fullWidth: true,
 		},
 	],

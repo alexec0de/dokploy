@@ -1,7 +1,7 @@
-import { db } from "@dokploy/server/db";
-import { notifications } from "@dokploy/server/db/schema";
-import BuildSuccessEmail from "@dokploy/server/emails/emails/build-success";
-import type { Domain } from "@dokploy/server/services/domain";
+import { db } from "@vieploy/server/db";
+import { notifications } from "@vieploy/server/db/schema";
+import BuildSuccessEmail from "@vieploy/server/emails/emails/build-success";
+import type { Domain } from "@vieploy/server/services/domain";
 import { render } from "@react-email/components";
 import { format } from "date-fns";
 import { and, eq } from "drizzle-orm";
@@ -158,7 +158,7 @@ export const sendBuildSuccessNotifications = async ({
 					],
 					timestamp: date.toISOString(),
 					footer: {
-						text: "Dokploy Build Notification",
+						text: "Vieploy Build Notification",
 					},
 				});
 			}
@@ -273,7 +273,7 @@ export const sendBuildSuccessNotifications = async ({
 				await sendMattermostNotification(mattermost, {
 					text: `**✅ Build Success**\n\n**Project:** ${projectName}\n**Application:** ${applicationName}\n**Type:** ${applicationType}\n**Date:** ${format(date, "PP")}\n**Time:** ${format(date, "pp")}\n\n[View Build Details](${buildLink})`,
 					channel: mattermost.channel,
-					username: mattermost.username || "Dokploy",
+					username: mattermost.username || "Vieploy",
 				});
 			}
 

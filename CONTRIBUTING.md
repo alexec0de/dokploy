@@ -1,6 +1,6 @@
 # Contributing
 
-Hey, thanks for your interest in contributing to Dokploy! We appreciate your help and taking your time to contribute.
+Hey, thanks for your interest in contributing to Vieploy! We appreciate your help and taking your time to contribute.
 
 Before you start, please first discuss the feature/bug you want to add with the owners and community via github issues.
 
@@ -56,10 +56,10 @@ Before you start, please make the clone based on the `canary` branch, since the 
 We use Node v24.22.1 and recommend this specific version. If you have nvm installed, you can run `nvm install 24.22.1 && nvm use` in the root directory.
 
 ```bash
-git clone https://github.com/dokploy/dokploy.git
-cd dokploy
+git clone https://github.com/alexec0de/dokploy.git vieploy
+cd vieploy
 pnpm install
-cp apps/dokploy/.env.example apps/dokploy/.env
+cp apps/vieploy/.env.example apps/vieploy/.env
 ```
 
 ## Requirements
@@ -71,7 +71,7 @@ cp apps/dokploy/.env.example apps/dokploy/.env
 Run the command that will spin up all the required services and files.
 
 ```bash
-pnpm run dokploy:setup
+pnpm run vieploy:setup
 ```
 
 Run this script
@@ -83,7 +83,7 @@ pnpm run server:script
 Now run the development server.
 
 ```bash
-pnpm run dokploy:dev
+pnpm run vieploy:dev
 ```
 
 Go to http://localhost:3000 to see the development server
@@ -94,7 +94,7 @@ Go to http://localhost:3000 to see the development server
 ## Build
 
 ```bash
-pnpm run dokploy:build
+pnpm run vieploy:build
 ```
 
 ## Docker
@@ -102,20 +102,20 @@ pnpm run dokploy:build
 To build the docker image first run commands to copy .env files
 
 ```bash
-cp apps/dokploy/.env.production.example .env.production
-cp apps/dokploy/.env.production.example apps/dokploy/.env.production
+cp apps/vieploy/.env.production.example .env.production
+cp apps/vieploy/.env.production.example apps/vieploy/.env.production
 ```
 
 then run build command
 
 ```bash
-pnpm run docker:build
+pnpm --filter=vieploy run docker:build
 ```
 
 To push the docker image
 
 ```bash
-pnpm run docker:push
+VIEPLOY_IMAGE=your-namespace/vieploy pnpm --filter=vieploy run docker:push
 ```
 
 ## Password Reset
@@ -123,13 +123,13 @@ pnpm run docker:push
 In the case you lost your password, you can reset the owner's password using the following command
 
 ```bash
-pnpm --filter=dokploy run reset-password
+pnpm --filter=vieploy run reset-password
 ```
 
 To reset the password of a specific user instead, pass their email as an argument
 
 ```bash
-pnpm --filter=dokploy run reset-password user@example.com
+pnpm --filter=vieploy run reset-password user@example.com
 ```
 
 Both commands print the new randomly generated password to the console.
@@ -184,7 +184,7 @@ curl -sSL "https://github.com/buildpacks/pack/releases/download/v0.39.1/pack-v0.
 - **Focus and Scope:** Each Pull Request should ideally address a single, well-defined problem or introduce one new feature. This greatly facilitates review and reduces the chances of introducing unintended side effects.
 - **Avoid Unfocused Changes:** Please avoid submitting Pull Requests that contain only minor changes such as whitespace adjustments, IDE-generated formatting, or removal of unused variables, unless these are part of a larger, clearly defined refactor or a dedicated "cleanup" Pull Request that addresses a specific `good first issue` or maintenance task.
 - **Issue Association:** For any significant change, it's highly recommended to open an issue first to discuss the proposed solution with the community and maintainers. This ensures alignment and avoids duplicated effort. If your PR resolves an existing issue, please link it in the description (e.g., `Fixes #123`, `Closes #456`).
-- **Large Features:** Pull Requests that introduce very large or broad features **will not be accepted** unless the idea is first outlined and discussed in a GitHub issue. Large features should be designed together with the Dokploy team so the project stays coherent and moves in the same direction. Open an issue to propose and align on the design before implementing.
+- **Large Features:** Pull Requests that introduce very large or broad features **will not be accepted** unless the idea is first outlined and discussed in a GitHub issue. Large features should be designed together with the Vieploy team so the project stays coherent and moves in the same direction. Open an issue to propose and align on the design before implementing.
 
 Thank you for your contribution!
 
@@ -201,4 +201,4 @@ To add a new template, go to `https://github.com/Dokploy/templates` repository a
 
 ## Docs & Website
 
-To contribute to the Dokploy docs or website, please go to this [repository](https://github.com/Dokploy/website).
+To contribute to the Vieploy docs or website, please go to this [repository](https://github.com/Dokploy/website).

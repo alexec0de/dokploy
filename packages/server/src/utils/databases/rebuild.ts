@@ -1,4 +1,4 @@
-import { db } from "@dokploy/server/db";
+import { db } from "@vieploy/server/db";
 import {
 	libsql,
 	mariadb,
@@ -6,13 +6,13 @@ import {
 	mysql,
 	postgres,
 	redis,
-} from "@dokploy/server/db/schema";
-import { deployLibsql } from "@dokploy/server/services/libsql";
-import { deployMariadb } from "@dokploy/server/services/mariadb";
-import { deployMongo } from "@dokploy/server/services/mongo";
-import { deployMySql } from "@dokploy/server/services/mysql";
-import { deployPostgres } from "@dokploy/server/services/postgres";
-import { deployRedis } from "@dokploy/server/services/redis";
+} from "@vieploy/server/db/schema";
+import { deployLibsql } from "@vieploy/server/services/libsql";
+import { deployMariadb } from "@vieploy/server/services/mariadb";
+import { deployMongo } from "@vieploy/server/services/mongo";
+import { deployMySql } from "@vieploy/server/services/mysql";
+import { deployPostgres } from "@vieploy/server/services/postgres";
+import { deployRedis } from "@vieploy/server/services/redis";
 import { eq } from "drizzle-orm";
 import { quote } from "shell-quote";
 import { removeService } from "../docker/utils";

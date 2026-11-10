@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 132" role="img" aria-label="Vieploy">
+  <rect width="440" height="132" rx="24" fill="#0b1220"/>
+  <path fill="#5eead4" transform="translate(27 22) scale(1.8)" d="M3 8h10l11 23L35 8h10L24 43Z M20 8h8l-4 8Z"/>
+  <text x="128" y="89" fill="#f8fafc" font-family="Helvetica, Arial, sans-serif" font-size="68" font-weight="700">Vieploy</text>
+</svg>

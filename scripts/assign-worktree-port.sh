@@ -8,7 +8,7 @@ if [ -z "$WORKTREE_PATH" ]; then
 	exit 0
 fi
 
-ENV_FILE="$WORKTREE_PATH/apps/dokploy/.env"
+ENV_FILE="$WORKTREE_PATH/apps/vieploy/.env"
 if [ ! -f "$ENV_FILE" ]; then
 	exit 0
 fi

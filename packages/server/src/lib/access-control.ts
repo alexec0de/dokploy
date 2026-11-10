@@ -1,7 +1,7 @@
 import { createAccessControl } from "better-auth/plugins/access";
 
 /**
- * Dokploy Access Control Statements
+ * Vieploy Access Control Statements
  *
  * Defines all resources and their possible actions across the platform.
  * The first 5 (organization, member, invitation, team, ac) are better-auth defaults
@@ -19,7 +19,7 @@ export const statements = {
 	team: ["create", "update", "delete"],
 	ac: ["create", "read", "update", "delete"],
 
-	// Dokploy core resources (free tier)
+	// Vieploy core resources (free tier)
 	project: ["create", "delete"],
 	service: ["create", "read", "delete"],
 	environment: ["create", "read", "delete"],

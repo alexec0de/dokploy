@@ -1,6 +1,6 @@
-import { db } from "@dokploy/server/db";
-import { gitProvider, member } from "@dokploy/server/db/schema";
-import { hasValidLicense } from "@dokploy/server/services/proprietary/license-key";
+import { db } from "@vieploy/server/db";
+import { gitProvider, member } from "@vieploy/server/db/schema";
+import { hasValidLicense } from "@vieploy/server/services/proprietary/license-key";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 

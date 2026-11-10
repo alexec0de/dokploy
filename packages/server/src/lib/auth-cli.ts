@@ -30,6 +30,11 @@ export const auth = betterAuth({
 			isValidEnterpriseLicense: { type: "boolean", required: false },
 		},
 	},
+	session: {
+		additionalFields: {
+			twoFactorVerified: { type: "boolean", defaultValue: false, input: false },
+		},
+	},
 	plugins: [
 		apiKey({ enableMetadata: true, references: "user" }),
 		sso({
@@ -38,7 +43,7 @@ export const auth = betterAuth({
 				enabled: true,
 			},
 		}),
-		twoFactor(),
+		twoFactor({ allowPasswordless: true }),
 		passkey(),
 		organization({
 			ac,

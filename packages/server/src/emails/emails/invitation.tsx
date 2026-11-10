@@ -6,7 +6,6 @@ import {
 	Heading,
 	Hr,
 	Html,
-	Img,
 	Link,
 	Preview,
 	Section,
@@ -26,7 +25,7 @@ export const InvitationEmail = ({
 	toEmail,
 	organizationName = "an organization",
 }: InvitationEmailProps) => {
-	const previewText = `You've been invited to join ${organizationName} on Dokploy`;
+	const previewText = `You've been invited to join ${organizationName} on Vieploy`;
 	return (
 		<Html>
 			<Head />
@@ -36,13 +35,9 @@ export const InvitationEmail = ({
 					<Container className="my-[40px] mx-auto max-w-[520px]">
 						{/* Header */}
 						<Section className="bg-[#09090b] rounded-t-xl px-[40px] py-[32px] text-center">
-							<Img
-								src="https://raw.githubusercontent.com/Dokploy/website/refs/heads/main/apps/docs/public/logo-dokploy-blackpng.png"
-								width="190"
-								height="120"
-								alt="Dokploy"
-								className="my-0 mx-auto"
-							/>
+							<Text className="text-white text-[26px] font-bold text-center my-0">
+								Vieploy
+							</Text>
 						</Section>
 
 						{/* Body */}
@@ -53,7 +48,7 @@ export const InvitationEmail = ({
 							<Text className="text-[#71717a] text-[14px] leading-[22px] m-0 mb-[24px]">
 								You have been invited to join{" "}
 								<strong className="text-[#09090b]">{organizationName}</strong>{" "}
-								on Dokploy, the platform for deploying your apps to the cloud.
+								on Vieploy, the platform for deploying your apps to the cloud.
 								Click the button below to accept the invitation.
 							</Text>
 
@@ -87,7 +82,7 @@ export const InvitationEmail = ({
 									href="https://dokploy.com"
 									className="text-[#71717a] underline"
 								>
-									Dokploy Cloud
+									Vieploy Cloud
 								</Link>
 								. If you were not expecting this invitation, you can safely
 								ignore this email.

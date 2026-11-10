@@ -6,7 +6,7 @@ import {
 } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { paths } from "@dokploy/server/constants";
+import { paths } from "@vieploy/server/constants";
 import { betterAuthSecret, HARDCODED_LEGACY_SECRET } from "./auth-secret";
 import { encryptionSecret } from "./encryption-secret";
 

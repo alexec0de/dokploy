@@ -1,37 +1,37 @@
 import path from "node:path";
-import { paths } from "@dokploy/server/constants";
-import { db } from "@dokploy/server/db";
+import { paths } from "@vieploy/server/constants";
+import { db } from "@vieploy/server/db";
 import {
 	type apiTransferService,
 	deployments,
 	network,
 	type ServiceType,
-} from "@dokploy/server/db/schema";
-import { removeService } from "@dokploy/server/utils/docker/utils";
+} from "@vieploy/server/db/schema";
+import { removeService } from "@vieploy/server/utils/docker/utils";
 import {
 	removeDirectoryCode,
 	removeMonitoringDirectory,
-} from "@dokploy/server/utils/filesystem/directory";
+} from "@vieploy/server/utils/filesystem/directory";
 import {
 	execAsync,
 	execAsyncRemote,
-} from "@dokploy/server/utils/process/execAsync";
-import { pipeBetweenServers } from "@dokploy/server/utils/process/remoteStream";
+} from "@vieploy/server/utils/process/execAsync";
+import { pipeBetweenServers } from "@vieploy/server/utils/process/remoteStream";
 import {
 	readConfig,
 	readRemoteConfig,
 	removeTraefikConfig,
 	writeConfig,
 	writeConfigRemote,
-} from "@dokploy/server/utils/traefik/application";
-import { manageDomain } from "@dokploy/server/utils/traefik/domain";
-import { removeForwardAuthMiddleware } from "@dokploy/server/utils/traefik/forward-auth";
+} from "@vieploy/server/utils/traefik/application";
+import { manageDomain } from "@vieploy/server/utils/traefik/domain";
+import { removeForwardAuthMiddleware } from "@vieploy/server/utils/traefik/forward-auth";
 import {
 	deleteAllMiddlewares,
 	removePathMiddlewares,
-} from "@dokploy/server/utils/traefik/middleware";
-import { createRedirectMiddleware } from "@dokploy/server/utils/traefik/redirect";
-import { createSecurityMiddleware } from "@dokploy/server/utils/traefik/security";
+} from "@vieploy/server/utils/traefik/middleware";
+import { createRedirectMiddleware } from "@vieploy/server/utils/traefik/redirect";
+import { createSecurityMiddleware } from "@vieploy/server/utils/traefik/security";
 import { TRPCError } from "@trpc/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import { quote } from "shell-quote";
@@ -487,8 +487,8 @@ export const transferService = async (
 		}
 	}
 
-	const sourceName = service.server?.name ?? "Dokploy Server";
-	const targetName = targetServer?.name ?? "Dokploy Server";
+	const sourceName = service.server?.name ?? "Vieploy Server";
+	const targetName = targetServer?.name ?? "Vieploy Server";
 	const originalNetworkIds =
 		"networkIds" in service ? service.networkIds : undefined;
 	let switched = false;

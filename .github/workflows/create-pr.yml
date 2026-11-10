@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Get version from package.json
-        run: echo "VERSION=$(jq -r .version ./apps/dokploy/package.json)" >> "$GITHUB_ENV"
+        run: echo "VERSION=$(jq -r .version ./apps/vieploy/package.json)" >> "$GITHUB_ENV"
 
       - name: Get latest GitHub tag
         run: |

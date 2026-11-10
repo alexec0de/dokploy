@@ -1,7 +1,7 @@
 import fs, { writeFileSync } from "node:fs";
 import path from "node:path";
-import { paths } from "@dokploy/server/constants";
-import type { Domain } from "@dokploy/server/services/domain";
+import { paths } from "@vieploy/server/constants";
+import type { Domain } from "@vieploy/server/services/domain";
 import { quote } from "shell-quote";
 import { parse, stringify } from "yaml";
 import {

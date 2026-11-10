@@ -1,13 +1,13 @@
 import { createWriteStream } from "node:fs";
 import path from "node:path";
-import { IS_CLOUD, paths } from "@dokploy/server/constants";
-import type { Schedule } from "@dokploy/server/db/schema/schedule";
+import { IS_CLOUD, paths } from "@vieploy/server/constants";
+import type { Schedule } from "@vieploy/server/db/schema/schedule";
 import {
 	createDeploymentSchedule,
 	updateDeployment,
 	updateDeploymentStatus,
-} from "@dokploy/server/services/deployment";
-import { findScheduleById } from "@dokploy/server/services/schedule";
+} from "@vieploy/server/services/deployment";
+import { findScheduleById } from "@vieploy/server/services/schedule";
 import { scheduledJobs, scheduleJob as scheduleJobNode } from "node-schedule";
 import { quote } from "shell-quote";
 import { getComposeContainer, getServiceContainer } from "../docker/utils";

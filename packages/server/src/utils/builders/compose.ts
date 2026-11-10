@@ -1,6 +1,6 @@
 import { dirname, join } from "node:path";
-import { paths } from "@dokploy/server/constants";
-import type { InferResultType } from "@dokploy/server/types/with";
+import { paths } from "@vieploy/server/constants";
+import type { InferResultType } from "@vieploy/server/types/with";
 import boxen from "boxen";
 import { quote } from "shell-quote";
 import { writeDomainsToCompose } from "../docker/domain";

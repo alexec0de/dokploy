@@ -1,14 +1,14 @@
 import { join } from "node:path";
-import { paths } from "@dokploy/server/constants";
+import { paths } from "@vieploy/server/constants";
 import type {
 	apiBitbucketTestConnection,
 	apiFindBitbucketBranches,
-} from "@dokploy/server/db/schema";
+} from "@vieploy/server/db/schema";
 import {
 	type Bitbucket,
 	findBitbucketById,
-} from "@dokploy/server/services/bitbucket";
-import type { InferResultType } from "@dokploy/server/types/with";
+} from "@vieploy/server/services/bitbucket";
+import type { InferResultType } from "@vieploy/server/types/with";
 import { TRPCError } from "@trpc/server";
 import { quote } from "shell-quote";
 import type { z } from "zod";

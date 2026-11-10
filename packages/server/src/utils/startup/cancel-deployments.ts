@@ -3,7 +3,7 @@ import {
 	compose,
 	deployments,
 	schedules,
-} from "@dokploy/server/db/schema";
+} from "@vieploy/server/db/schema";
 import { eq, inArray } from "drizzle-orm";
 import { db } from "../../db/index";
 

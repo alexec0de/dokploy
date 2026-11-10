@@ -1,4 +1,4 @@
-import type { DnsProviderConfig } from "@dokploy/server/db/schema";
+import type { DnsProviderConfig } from "@vieploy/server/db/schema";
 import { cloudflareClient } from "./cloudflare";
 import { infomaniakClient } from "./infomaniak";
 import { ovhClient } from "./ovh";

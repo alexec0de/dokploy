@@ -1,10 +1,10 @@
 import fs, { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { paths } from "@dokploy/server/constants";
-import { db } from "@dokploy/server/db";
-import { network, patch } from "@dokploy/server/db/schema";
-import type { Compose } from "@dokploy/server/services/compose";
-import type { Domain } from "@dokploy/server/services/domain";
+import { paths } from "@vieploy/server/constants";
+import { db } from "@vieploy/server/db";
+import { network, patch } from "@vieploy/server/db/schema";
+import type { Compose } from "@vieploy/server/services/compose";
+import type { Domain } from "@vieploy/server/services/domain";
 import { eq, inArray } from "drizzle-orm";
 import { quote } from "shell-quote";
 import { parse, stringify } from "yaml";

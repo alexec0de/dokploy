@@ -1,6 +1,6 @@
-import { resolveServiceNetworks } from "@dokploy/server/services/network";
-import { findRegistryByIdWithCredentials } from "@dokploy/server/services/registry";
-import type { InferResultType } from "@dokploy/server/types/with";
+import { resolveServiceNetworks } from "@vieploy/server/services/network";
+import { findRegistryByIdWithCredentials } from "@vieploy/server/services/registry";
+import type { InferResultType } from "@vieploy/server/types/with";
 import type { CreateServiceOptions } from "dockerode";
 import { getRegistryTag, uploadImageRemoteCommand } from "../cluster/upload";
 import { buildDokployLabels } from "../docker/dokploy-labels";
@@ -196,8 +196,8 @@ export const mechanizeDockerContainer = async (
 		await service.update({
 			version: Number.parseInt(inspect.Version.Index),
 			...settings,
-			// Dokploy sets no service-level labels of its own. A service update
-			// replaces the whole spec, so labels added outside Dokploy (e.g.
+			// Vieploy sets no service-level labels of its own. A service update
+			// replaces the whole spec, so labels added outside Vieploy (e.g.
 			// traefik.* for the Swarm provider) are dropped unless carried over.
 			Labels: inspect.Spec?.Labels ?? {},
 			TaskTemplate: {

@@ -1,10 +1,10 @@
-import { db } from "@dokploy/server/db";
+import { db } from "@vieploy/server/db";
 import {
 	type apiCreateTelemetryProvider,
 	server,
 	telemetryProvider,
 	webServerSettings,
-} from "@dokploy/server/db/schema";
+} from "@vieploy/server/db/schema";
 import { TRPCError } from "@trpc/server";
 import { and, arrayContains, eq, sql } from "drizzle-orm";
 import type { z } from "zod";
@@ -127,7 +127,7 @@ export const createTelemetryProvider = async (
 	return created;
 };
 
-// null is the Dokploy host.
+// null is the Vieploy host.
 export type VectorTarget = string | null;
 
 const findTargetsUsingProvider = async (

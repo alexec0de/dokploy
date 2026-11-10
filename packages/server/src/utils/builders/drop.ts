@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
 import path, { join } from "node:path";
-import { paths } from "@dokploy/server/constants";
-import type { Application } from "@dokploy/server/services/application";
-import { findServerById } from "@dokploy/server/services/server";
-import { readValidDirectory } from "@dokploy/server/wss/utils";
+import { paths } from "@vieploy/server/constants";
+import type { Application } from "@vieploy/server/services/application";
+import { findServerById } from "@vieploy/server/services/server";
+import { readValidDirectory } from "@vieploy/server/wss/utils";
 import AdmZip from "adm-zip";
 import { Client, type SFTPWrapper } from "ssh2";
 import {

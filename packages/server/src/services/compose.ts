@@ -1,36 +1,36 @@
 import { join } from "node:path";
-import { paths } from "@dokploy/server/constants";
-import { db } from "@dokploy/server/db";
+import { paths } from "@vieploy/server/constants";
+import { db } from "@vieploy/server/db";
 import {
 	type apiCreateCompose,
 	buildAppName,
 	cleanAppName,
 	compose,
-} from "@dokploy/server/db/schema";
-import { getBuildComposeCommand } from "@dokploy/server/utils/builders/compose";
-import { randomizeSpecificationFile } from "@dokploy/server/utils/docker/compose";
+} from "@vieploy/server/db/schema";
+import { getBuildComposeCommand } from "@vieploy/server/utils/builders/compose";
+import { randomizeSpecificationFile } from "@vieploy/server/utils/docker/compose";
 import {
 	cloneCompose,
 	loadDockerCompose,
 	loadDockerComposeRemote,
-} from "@dokploy/server/utils/docker/domain";
-import type { ComposeSpecification } from "@dokploy/server/utils/docker/types";
-import { sendBuildErrorNotifications } from "@dokploy/server/utils/notifications/build-error";
-import { getBuildErrorMessage } from "@dokploy/server/utils/notifications/build-error-message";
-import { sendBuildSuccessNotifications } from "@dokploy/server/utils/notifications/build-success";
+} from "@vieploy/server/utils/docker/domain";
+import type { ComposeSpecification } from "@vieploy/server/utils/docker/types";
+import { sendBuildErrorNotifications } from "@vieploy/server/utils/notifications/build-error";
+import { getBuildErrorMessage } from "@vieploy/server/utils/notifications/build-error-message";
+import { sendBuildSuccessNotifications } from "@vieploy/server/utils/notifications/build-success";
 import {
 	execAsync,
 	execAsyncRemote,
-} from "@dokploy/server/utils/process/execAsync";
-import { cloneBitbucketRepository } from "@dokploy/server/utils/providers/bitbucket";
+} from "@vieploy/server/utils/process/execAsync";
+import { cloneBitbucketRepository } from "@vieploy/server/utils/providers/bitbucket";
 import {
 	cloneGitRepository,
 	getGitCommitInfo,
-} from "@dokploy/server/utils/providers/git";
-import { cloneGiteaRepository } from "@dokploy/server/utils/providers/gitea";
-import { cloneGithubRepository } from "@dokploy/server/utils/providers/github";
-import { cloneGitlabRepository } from "@dokploy/server/utils/providers/gitlab";
-import { getCreateComposeFileCommand } from "@dokploy/server/utils/providers/raw";
+} from "@vieploy/server/utils/providers/git";
+import { cloneGiteaRepository } from "@vieploy/server/utils/providers/gitea";
+import { cloneGithubRepository } from "@vieploy/server/utils/providers/github";
+import { cloneGitlabRepository } from "@vieploy/server/utils/providers/gitlab";
+import { getCreateComposeFileCommand } from "@vieploy/server/utils/providers/raw";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { quote } from "shell-quote";

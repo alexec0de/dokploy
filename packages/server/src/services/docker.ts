@@ -2,7 +2,7 @@ import {
 	ExecError,
 	execAsync,
 	execAsyncRemote,
-} from "@dokploy/server/utils/process/execAsync";
+} from "@vieploy/server/utils/process/execAsync";
 import { quote } from "shell-quote";
 
 export const getContainers = async (serverId?: string | null) => {
@@ -796,7 +796,7 @@ export const uploadFileToContainer = async (
 export const CONTAINER_FILE_SIZE_LIMIT = 512 * 1024;
 
 const NO_SHELL_UTILITIES_ERROR =
-	"This container image has no shell utilities and its filesystem is not accessible from the Dokploy host.";
+	"This container image has no shell utilities and its filesystem is not accessible from the Vieploy host.";
 
 const isMissingBinaryError = (error: unknown) =>
 	error instanceof ExecError &&

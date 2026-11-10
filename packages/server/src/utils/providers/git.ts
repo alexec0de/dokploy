@@ -1,9 +1,9 @@
 import path, { join } from "node:path";
-import { paths } from "@dokploy/server/constants";
+import { paths } from "@vieploy/server/constants";
 import {
 	findSSHKeyById,
 	updateSSHKeyById,
-} from "@dokploy/server/services/ssh-key";
+} from "@vieploy/server/services/ssh-key";
 import { quote } from "shell-quote";
 import { execAsync, execAsyncRemote } from "../process/execAsync";
 

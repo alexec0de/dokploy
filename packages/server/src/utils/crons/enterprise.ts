@@ -1,4 +1,4 @@
-import { getPublicIpWithFallback } from "@dokploy/server/wss/utils";
+import { getPublicIpWithFallback } from "@vieploy/server/wss/utils";
 import { and, eq, isNotNull } from "drizzle-orm";
 import { scheduleJob } from "node-schedule";
 import { db } from "../../db/index";
