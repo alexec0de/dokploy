@@ -1,26 +1,27 @@
-import { randomBytes } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import type { IncomingMessage } from "node:http";
 import { apiKey } from "@better-auth/api-key";
 import { passkey } from "@better-auth/passkey";
 import { scim } from "@better-auth/scim";
 import { sso } from "@better-auth/sso";
+import { createOTP } from "@better-auth/utils/otp";
 import * as bcrypt from "bcrypt";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { APIError, createAuthMiddleware } from "better-auth/api";
-import { setSessionCookie } from "better-auth/cookies";
-import { admin, organization, twoFactor } from "better-auth/plugins";
 import {
-	and,
-	desc,
-	eq,
-	exists,
-	isNotNull,
-	isNull,
-	lte,
-	or,
-	sql,
-} from "drizzle-orm";
+	APIError,
+	createAuthEndpoint,
+	createAuthMiddleware,
+} from "better-auth/api";
+import { setSessionCookie } from "better-auth/cookies";
+import {
+	generateRandomString,
+	symmetricDecrypt,
+	symmetricEncrypt,
+} from "better-auth/crypto";
+import { admin, organization, twoFactor } from "better-auth/plugins";
+import { and, desc, eq, exists, isNull, lte, or, sql } from "drizzle-orm";
+import { z } from "zod";
 import { IS_CLOUD } from "../constants";
 import { db } from "../db";
 import * as schema from "../db/schema";
@@ -132,6 +133,90 @@ const twoFactorIsEnrolled = (userId: string) =>
 				),
 			),
 	);
+
+// Reuse Better Auth verification while letting an authenticated session start enrollment.
+const twoFactorPlugin = () => {
+	const plugin = twoFactor({ allowPasswordless: true });
+	const enable = plugin.endpoints.enableTwoFactor;
+
+	return {
+		...plugin,
+		endpoints: {
+			...plugin.endpoints,
+			enableTwoFactor: createAuthEndpoint(
+				enableTwoFactorPath,
+				enable.options,
+				async (ctx) => {
+					const { user, session } = ctx.context.session;
+					if (session.impersonatedBy) throw new APIError("FORBIDDEN");
+
+					const key = ctx.context.secretConfig;
+					const { secret, backupCodes } = await db.transaction(async (tx) => {
+						const [account] = await tx
+							.select({
+								banned: schema.user.banned,
+								twoFactorEnabled: schema.user.twoFactorEnabled,
+							})
+							.from(schema.user)
+							.where(eq(schema.user.id, user.id))
+							.for("update");
+
+						if (!account || account.banned || account.twoFactorEnabled) {
+							throw new APIError("FORBIDDEN", {
+								message: "This account cannot enroll a new authenticator",
+							});
+						}
+
+						const pending = await tx.query.twoFactor.findFirst({
+							where: eq(schema.twoFactor.userId, user.id),
+						});
+						if (pending && !pending.verified) {
+							const storedCodes = await symmetricDecrypt({
+								key,
+								data: pending.backupCodes,
+							});
+							const backupCodes = z
+								.array(z.string())
+								.parse(JSON.parse(storedCodes));
+							return {
+								secret: await symmetricDecrypt({ key, data: pending.secret }),
+								backupCodes,
+							};
+						}
+
+						const secret = generateRandomString(32);
+						const backupCodes = Array.from({ length: 10 }, () => {
+							const code = generateRandomString(10, "a-z", "0-9", "A-Z");
+							return `${code.slice(0, 5)}-${code.slice(5)}`;
+						});
+						await tx
+							.delete(schema.twoFactor)
+							.where(eq(schema.twoFactor.userId, user.id));
+						await tx.insert(schema.twoFactor).values({
+							id: randomUUID(),
+							userId: user.id,
+							secret: await symmetricEncrypt({ key, data: secret }),
+							backupCodes: await symmetricEncrypt({
+								key,
+								data: JSON.stringify(backupCodes),
+							}),
+							verified: false,
+						});
+						return { secret, backupCodes };
+					});
+
+					return ctx.json({
+						totpURI: createOTP(secret, { digits: 6, period: 30 }).url(
+							ctx.body.issuer || ctx.context.appName,
+							user.email,
+						),
+						backupCodes,
+					});
+				},
+			),
+		},
+	};
+};
 
 const createBetterAuth = () =>
 	betterAuth({
@@ -269,32 +354,6 @@ const createBetterAuth = () =>
 							throw new APIError("FORBIDDEN", {
 								message: "Complete two-factor authentication first",
 							});
-						}
-						if (mayEnroll) {
-							// Older resets cleared the user flag but could leave a verified authenticator.
-							await db
-								.update(schema.twoFactor)
-								.set({ verified: false })
-								.where(
-									and(
-										eq(schema.twoFactor.userId, session.user.id),
-										eq(schema.twoFactor.verified, true),
-										exists(
-											db
-												.select({ id: schema.user.id })
-												.from(schema.user)
-												.where(
-													and(
-														eq(schema.user.id, session.user.id),
-														or(
-															eq(schema.user.twoFactorEnabled, false),
-															isNull(schema.user.twoFactorEnabled),
-														),
-													),
-												),
-										),
-									),
-								);
 						}
 						if (mayVerify) {
 							// Better Auth applies its account lockout only to its sign-in challenge.
@@ -771,7 +830,7 @@ const createBetterAuth = () =>
 					}
 				},
 			}),
-			twoFactor({ allowPasswordless: true }),
+			twoFactorPlugin(),
 			passkey(),
 			organization({
 				ac,
@@ -833,19 +892,7 @@ export const getTwoFactorState = async (request: IncomingMessage) => {
 	if (hasTwoFactorProof(session)) return { step: "complete" } as const;
 	if (session.user.twoFactorEnabled) return { step: "verify" } as const;
 
-	const credential = await db.query.account.findFirst({
-		columns: { id: true },
-		where: and(
-			eq(schema.account.userId, session.user.id),
-			eq(schema.account.providerId, "credential"),
-			isNotNull(schema.account.password),
-		),
-	});
-	return {
-		step: "enroll",
-		email: session.user.email,
-		requiresPassword: !!credential,
-	} as const;
+	return { step: "enroll", email: session.user.email } as const;
 };
 
 export const validateRequest = async (request: IncomingMessage) => {

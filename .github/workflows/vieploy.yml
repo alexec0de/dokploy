@@ -2,7 +2,7 @@ name: Vieploy Docker Build
 
 on:
   push:
-    branches: [main, canary, vieploy]
+    branches: [main, canary]
   workflow_dispatch:
 
 env:
@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   docker-amd:
-    if: vars.VIEPLOY_IMAGE != ''
+    if: github.ref != 'refs/heads/vieploy' && vars.VIEPLOY_IMAGE != ''
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -56,7 +56,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
   docker-arm:
-    if: vars.VIEPLOY_IMAGE != ''
+    if: github.ref != 'refs/heads/vieploy' && vars.VIEPLOY_IMAGE != ''
     runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout

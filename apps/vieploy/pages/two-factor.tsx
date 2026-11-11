@@ -73,11 +73,7 @@ export default function TwoFactor(props: Props) {
 			</CardHeader>
 			<CardContent className="space-y-4">
 				{props.step === "enroll" && (
-					<Enable2FA
-						email={props.email}
-						requiresPassword={props.requiresPassword}
-						onVerified={continueToDashboard}
-					/>
+					<Enable2FA email={props.email} onVerified={continueToDashboard} />
 				)}
 				{props.step === "verify" && (
 					<form className="ph-no-capture space-y-4" onSubmit={verify}>

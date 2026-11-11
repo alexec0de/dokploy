@@ -19,134 +19,103 @@ import {
 } from "../setup/traefik-setup";
 export interface IUpdateData {
 	latestVersion: string | null;
+	imageDigest: string | null;
 	updateAvailable: boolean;
 }
 
-const configuredImage = process.env.VIEPLOY_IMAGE;
-export const VIEPLOY_IMAGE =
-	configuredImage &&
-	/^[a-z0-9]+(?:[._-][a-z0-9]+)*\/[a-z0-9]+(?:[._-][a-z0-9]+)*$/.test(
-		configuredImage,
-	) &&
-	configuredImage !== "dokploy/dokploy"
-		? configuredImage
-		: undefined;
+const updateRepository = "alexec0de/dokploy";
+const updateBranch = "vieploy";
+export const VIEPLOY_IMAGE = "ghcr.io/alexec0de/vieploy";
 
 export const DEFAULT_UPDATE_DATA: IUpdateData = {
 	latestVersion: null,
+	imageDigest: null,
 	updateAvailable: false,
 };
 
-/** Returns current Vieploy docker image tag or `latest` by default. */
-export const getDokployImageTag = () => {
-	return process.env.RELEASE_TAG || "latest";
-};
+export const getDokployImageTag = () => process.env.RELEASE_TAG || "latest";
 
-/** Returns Vieploy docker service image digest */
-export const getServiceImageDigest = async () => {
+export const getUpdateData = async (): Promise<IUpdateData> => {
+	const fetchOptions = { redirect: "error" } as const;
+	const commitResponse = await fetch(
+		`https://api.github.com/repos/${updateRepository}/commits/${updateBranch}`,
+		{
+			...fetchOptions,
+			headers: {
+				Accept: "application/vnd.github+json",
+				"User-Agent": "Vieploy",
+			},
+			signal: AbortSignal.timeout(10_000),
+		},
+	);
+	if (!commitResponse.ok) {
+		throw new Error("Could not read the Vieploy branch on GitHub.");
+	}
+
+	const { sha } = (await commitResponse.json()) as { sha?: unknown };
+	if (typeof sha !== "string" || !/^[a-f0-9]{40}$/.test(sha)) {
+		throw new Error(
+			"GitHub returned an invalid commit for the Vieploy branch.",
+		);
+	}
+
+	const imagePath = VIEPLOY_IMAGE.slice("ghcr.io/".length);
+	const registry = "https://ghcr.io";
+	const tokenUrl = new URL("/token", registry);
+	tokenUrl.searchParams.set("service", "ghcr.io");
+	tokenUrl.searchParams.set("scope", `repository:${imagePath}:pull`);
+	const tokenResponse = await fetch(tokenUrl, {
+		...fetchOptions,
+		signal: AbortSignal.timeout(10_000),
+	});
+	if (!tokenResponse.ok) {
+		throw new Error(
+			"The Vieploy package is unavailable. Check GitHub Actions and the package's public visibility.",
+		);
+	}
+
+	const { token } = (await tokenResponse.json()) as { token?: unknown };
+	if (typeof token !== "string" || !token) {
+		throw new Error(
+			"GitHub Container Registry did not grant read access to Vieploy.",
+		);
+	}
+
+	const manifest = await fetch(`${registry}/v2/${imagePath}/manifests/${sha}`, {
+		...fetchOptions,
+		method: "HEAD",
+		headers: {
+			Authorization: `Bearer ${token}`,
+			Accept:
+				"application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json",
+		},
+		signal: AbortSignal.timeout(10_000),
+	});
+	if (manifest.status === 404) {
+		return { ...DEFAULT_UPDATE_DATA, latestVersion: sha };
+	}
+	if (!manifest.ok) {
+		throw new Error(
+			"Could not read the Vieploy image in GitHub Container Registry.",
+		);
+	}
+
+	const imageDigest = manifest.headers.get("Docker-Content-Digest");
+	if (!imageDigest || !/^sha256:[a-f0-9]{64}$/.test(imageDigest)) {
+		throw new Error(
+			"GitHub Container Registry returned an invalid image digest.",
+		);
+	}
+
 	const { stdout } = await execAsync(
 		"docker service inspect dokploy --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}'",
 	);
-
-	const currentDigest = stdout.trim().split("@")[1];
-
-	if (!currentDigest) {
-		throw new Error("Could not get current service image digest");
-	}
-
-	return currentDigest;
-};
-
-/** Returns latest version number and information whether server update is available by comparing current image's digest against digest for provided image tag via Docker hub API. */
-export const getUpdateData = async (
-	currentVersion: string,
-): Promise<IUpdateData> => {
-	if (!VIEPLOY_IMAGE) return DEFAULT_UPDATE_DATA;
-	try {
-		const baseUrl = `https://hub.docker.com/v2/repositories/${VIEPLOY_IMAGE}/tags`;
-		let url: string | null = `${baseUrl}?page_size=100`;
-		let allResults: { digest: string; name: string }[] = [];
-
-		// Fetch all tags from Docker Hub
-		while (url) {
-			const response = await fetch(url, {
-				method: "GET",
-				headers: { "Content-Type": "application/json" },
-			});
-
-			const data = (await response.json()) as {
-				next: string | null;
-				results: { digest: string; name: string }[];
-			};
-
-			allResults = allResults.concat(data.results);
-			url = data?.next;
-		}
-
-		const currentImageTag = getDokployImageTag();
-
-		// Special handling for canary and feature branches
-		// For development versions (canary/feature), don't perform update checks
-		// These are unstable versions that change frequently, and users on these
-		// branches are expected to manually manage updates
-		if (currentImageTag === "canary" || currentImageTag === "feature") {
-			const currentDigest = await getServiceImageDigest();
-			const latestDigest = allResults.find(
-				(t) => t.name === currentImageTag,
-			)?.digest;
-			if (!latestDigest) {
-				return DEFAULT_UPDATE_DATA;
-			}
-			if (currentDigest !== latestDigest) {
-				return {
-					latestVersion: currentImageTag,
-					updateAvailable: true,
-				};
-			}
-			return {
-				latestVersion: currentImageTag,
-				updateAvailable: false,
-			};
-		}
-
-		// For stable versions, use semver comparison
-		// Find the "latest" tag and get its digest
-		const latestTag = allResults.find((t) => t.name === "latest");
-
-		if (!latestTag) {
-			return DEFAULT_UPDATE_DATA;
-		}
-
-		// Find the versioned tag (v0.x.x) that has the same digest as "latest"
-		const latestVersionTag = allResults.find(
-			(t) => t.digest === latestTag.digest && t.name.startsWith("v"),
-		);
-
-		if (!latestVersionTag) {
-			return DEFAULT_UPDATE_DATA;
-		}
-
-		const latestVersion = latestVersionTag.name;
-
-		// Use semver to compare versions for stable releases
-		const cleanedCurrent = semver.clean(currentVersion);
-		const cleanedLatest = semver.clean(latestVersion);
-
-		if (!cleanedCurrent || !cleanedLatest) {
-			return DEFAULT_UPDATE_DATA;
-		}
-
-		// Check if the latest version is greater than the current version
-		const updateAvailable = semver.gt(cleanedLatest, cleanedCurrent);
-
-		return {
-			latestVersion,
-			updateAvailable,
-		};
-	} catch (error) {
-		console.error("Error fetching update data:", error);
-		return DEFAULT_UPDATE_DATA;
-	}
+	const deployedDigest = stdout.trim().split("@")[1];
+	return {
+		latestVersion: sha,
+		imageDigest,
+		updateAvailable: deployedDigest !== imageDigest,
+	};
 };
 
 interface TreeDataItem {

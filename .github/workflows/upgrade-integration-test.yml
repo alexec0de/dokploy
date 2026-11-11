@@ -19,10 +19,10 @@ on:
       target_version:
         description: 'Target tag for the Vieploy image'
         required: false
-        default: 'feature'
+        default: 'vieploy'
 
 env:
-  VIEPLOY_IMAGE:   ${{ vars.VIEPLOY_IMAGE }}
+  VIEPLOY_IMAGE:   ghcr.io/alexec0de/vieploy
   DOKPLOY_SERVICE: dokploy
   DOKPLOY_PORT:    3000
 
@@ -63,8 +63,7 @@ jobs:
           echo "All tags found:"
           echo "$ALL_TAGS"
 
-          : "${VIEPLOY_IMAGE:?Configure the VIEPLOY_IMAGE repository variable}"
-          TO="${TARGET:-feature}"
+          TO="${TARGET:-vieploy}"
           [[ "$TO" =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$ ]]
 
           # Floor semver components
@@ -372,7 +371,7 @@ jobs:
           sudo apt-get install -y -qq oathtool
           URI=$(curl -fsS -b "$COOKIE" -c "$COOKIE" -X POST "$BASE/api/auth/two-factor/enable" \
             -H "Origin: $BASE" -H "Content-Type: application/json" \
-            -d '{"password":"CiTest1234!"}' | jq -er .totpURI)
+            -d '{}' | jq -er .totpURI)
           SECRET=$(python3 -c 'import sys, urllib.parse as url; print(url.parse_qs(url.urlsplit(sys.stdin.read()).query)["secret"][0])' <<< "$URI")
           CODE=$(oathtool --base32 --totp "$SECRET")
           curl -fsS -b "$COOKIE" -c "$COOKIE" -X POST "$BASE/api/auth/two-factor/verify-totp" \

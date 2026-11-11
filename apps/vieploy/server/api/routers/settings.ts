@@ -624,7 +624,7 @@ export const settingsRouter = createTRPCRouter({
 			return DEFAULT_UPDATE_DATA;
 		}
 
-		return await getUpdateData(packageInfo.version);
+		return await getUpdateData();
 	}),
 	updateServer: adminProcedure.mutation(async ({ ctx }) => {
 		if (IS_CLOUD) {
@@ -640,14 +640,20 @@ export const settingsRouter = createTRPCRouter({
 			});
 		}
 
-		const data = await getUpdateData(packageInfo.version);
-		if (VIEPLOY_IMAGE && data.updateAvailable && data.latestVersion) {
-			void spawnAsync("docker", [
+		const data = await getUpdateData();
+		if (!data.imageDigest) {
+			throw new TRPCError({
+				code: "PRECONDITION_FAILED",
+				message: "The latest GitHub commit has no published image yet.",
+			});
+		}
+		if (data.updateAvailable) {
+			await spawnAsync("docker", [
 				"service",
 				"update",
-				"--force",
+				"--detach",
 				"--image",
-				`${VIEPLOY_IMAGE}:${data.latestVersion}`,
+				`${VIEPLOY_IMAGE}@${data.imageDigest}`,
 				"dokploy",
 			]);
 			await audit(ctx, {

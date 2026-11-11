@@ -4,6 +4,23 @@
 
 Vieploy is a self-hosted platform for deploying and managing applications, databases, and Docker Swarm workloads. It is based on the Dokploy project and retains its original license notices.
 
+## Install on a VPS
+
+On a fresh AMD64 or ARM64 Linux VPS, run the installer after the GitHub Actions build has published the public Vieploy image. The script installs Docker Engine on Ubuntu or Debian when needed. For other distributions, install Docker Engine first. It sets up Docker Swarm, PostgreSQL, Traefik, and the panel. It generates separate PostgreSQL and authentication secrets and stores them in Docker Swarm.
+
+```bash
+curl -fsSLo install.sh https://raw.githubusercontent.com/alexec0de/dokploy/vieploy/install.sh
+sudo bash install.sh
+```
+
+The panel uses TCP port 3000. Traefik uses TCP ports 80 and 443 and UDP port 443. Before installation, restrict public access to port 3000 using the VPS provider firewall while you create the first owner account. You can connect through SSH from your computer.
+
+```bash
+ssh -L 3000:127.0.0.1:3000 user@VPS_IP
+```
+
+Open [the panel over the SSH tunnel](http://localhost:3000), create the owner account, and configure 2FA. To install a specific published build, pass its full commit SHA in `VIEPLOY_TAG`. If Swarm cannot select the VPS network interface, pass its local IP address in `ADVERTISE_ADDR`.
+
 ## Run from source
 
 Use Node.js 24.22.1, pnpm 10.22.0 and Docker. Run these commands from the Vieploy checkout.
@@ -29,4 +46,16 @@ Configure `BETTER_AUTH_SECRET` or `BETTER_AUTH_SECRET_FILE` with a unique secret
 
 ## Existing installations
 
-The application still recognizes the original Docker service, network and volume names, storage paths, database identifiers and environment variables. Apply the included database migration when deploying the Vieploy build. To enable in-panel updates, configure `VIEPLOY_IMAGE` with the Docker Hub namespace and repository of your Vieploy builds.
+For an existing Swarm installation, back up PostgreSQL and `/etc/dokploy`, and verify that its authentication and PostgreSQL secrets meet the requirements above. Then switch the existing service to the published Vieploy image from the Swarm manager.
+
+```bash
+sudo docker service update --image ghcr.io/alexec0de/vieploy:vieploy dokploy
+```
+
+The service retains its mounts and environment and applies the included database migration during startup.
+
+## Manual updates
+
+The server settings check the `vieploy` branch of [alexec0de/dokploy](https://github.com/alexec0de/dokploy/tree/vieploy). GitHub Actions builds the branch for AMD64 and ARM64 and publishes each image to `ghcr.io/alexec0de/vieploy` under its commit SHA. The panel installs the published image by digest after an administrator confirms the update.
+
+After the first successful publish, set the [container package](https://github.com/users/alexec0de/packages/container/package/vieploy) visibility to Public so Docker Swarm can pull it.

@@ -108,7 +108,6 @@ import { DialogAction } from "../shared/dialog-action";
 import { Logo } from "../shared/logo";
 import { Button } from "../ui/button";
 import { TimeBadge } from "../ui/time-badge";
-import { UpdateServerButton } from "./update-server";
 import { UserNav } from "./user-nav";
 
 // The types of the queries we are going to use
@@ -1223,11 +1222,6 @@ export default function Page({ children }: Props) {
 				</SidebarContent>
 				<SidebarFooter>
 					<SidebarMenu className="flex flex-col gap-2">
-						{!isCloud && permissions?.organization.update && (
-							<SidebarMenuItem>
-								<UpdateServerButton />
-							</SidebarMenuItem>
-						)}
 						<SidebarMenuItem>
 							<UserNav />
 						</SidebarMenuItem>

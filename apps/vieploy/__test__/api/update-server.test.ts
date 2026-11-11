@@ -19,14 +19,18 @@ vi.mock("@vieploy/server", () => ({
 	cleanupImages: noop,
 	cleanupSystem: noop,
 	cleanupVolumes: noop,
-	DEFAULT_UPDATE_DATA: { latestVersion: null, updateAvailable: false },
+	DEFAULT_UPDATE_DATA: {
+		latestVersion: null,
+		imageDigest: null,
+		updateAvailable: false,
+	},
 	findServerById: noop,
 	getDockerDiskUsage: noop,
 	getDockerResourceType: mockGetDockerResourceType,
 	getDokployImageTag: () => "canary",
 	getLogCleanupStatus: noop,
 	getUpdateData: mockGetUpdateData,
-	VIEPLOY_IMAGE: "test/vieploy",
+	VIEPLOY_IMAGE: "ghcr.io/alexec0de/vieploy",
 	getWebServerSettings: noop,
 	IS_CLOUD: false,
 	parseRawConfig: noop,
@@ -109,7 +113,8 @@ describe("settings.updateServer", () => {
 	it("fails for a standalone container where docker service update cannot run", async () => {
 		mockGetDockerResourceType.mockResolvedValue("standalone");
 		mockGetUpdateData.mockResolvedValue({
-			latestVersion: "v9.9.9",
+			latestVersion: "a".repeat(40),
+			imageDigest: `sha256:${"b".repeat(64)}`,
 			updateAvailable: true,
 		});
 
@@ -124,7 +129,8 @@ describe("settings.updateServer", () => {
 	it("does not report a fake success when the update command cannot run", async () => {
 		mockGetDockerResourceType.mockResolvedValue("unknown");
 		mockGetUpdateData.mockResolvedValue({
-			latestVersion: "v9.9.9",
+			latestVersion: "a".repeat(40),
+			imageDigest: `sha256:${"b".repeat(64)}`,
 			updateAvailable: true,
 		});
 
@@ -135,16 +141,21 @@ describe("settings.updateServer", () => {
 	it("triggers the docker service update when the service exists", async () => {
 		mockGetDockerResourceType.mockResolvedValue("service");
 		mockGetUpdateData.mockResolvedValue({
-			latestVersion: "v9.9.9",
+			latestVersion: "a".repeat(40),
+			imageDigest: `sha256:${"b".repeat(64)}`,
 			updateAvailable: true,
 		});
 		mockSpawnAsync.mockResolvedValue({ stdout: "", stderr: null });
 
 		await expect(caller.updateServer()).resolves.toBe(true);
 
-		expect(mockSpawnAsync).toHaveBeenCalledWith(
-			"docker",
-			expect.arrayContaining(["service", "update", "test/vieploy:v9.9.9"]),
-		);
+		expect(mockSpawnAsync).toHaveBeenCalledWith("docker", [
+			"service",
+			"update",
+			"--detach",
+			"--image",
+			`ghcr.io/alexec0de/vieploy@sha256:${"b".repeat(64)}`,
+			"dokploy",
+		]);
 	});
 });
