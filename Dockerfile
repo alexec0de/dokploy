@@ -21,6 +21,7 @@ RUN pnpm --filter=@vieploy/server build
 RUN pnpm --filter=./apps/vieploy run build
 
 RUN pnpm --filter=./apps/vieploy --prod deploy --legacy /prod/vieploy
+RUN cd /prod/vieploy && node --input-type=module -e 'await import("@better-auth/utils/otp")'
 
 RUN cp -R /usr/src/app/apps/vieploy/.next /prod/vieploy/.next
 RUN cp -R /usr/src/app/apps/vieploy/dist /prod/vieploy/dist
